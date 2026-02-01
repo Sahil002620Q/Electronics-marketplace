@@ -1,20 +1,9 @@
 {
     "version": 2,
-    "builds": [
+    "rewrites": [
         {
-            "src": "backend/simple_server.py",
-            "use": "@vercel/python",
-            "config": {
-                "includeFiles": [
-                    "frontend/**"
-                ]
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "backend/simple_server.py"
+            "source": "/(.*)",
+            "destination": "/api/index.js"
         }
     ]
 }
