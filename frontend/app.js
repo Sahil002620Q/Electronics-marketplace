@@ -2,7 +2,7 @@ const { useState, useEffect, createContext, useContext } = React;
 
 // --- API Configuration ---
 const api = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: '', // Relative path for production
 });
 
 // Add token to requests if available

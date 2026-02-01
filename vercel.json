@@ -1,0 +1,20 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "backend/simple_server.py",
+            "use": "@vercel/python",
+            "config": {
+                "includeFiles": [
+                    "frontend/**"
+                ]
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "backend/simple_server.py"
+        }
+    ]
+}

@@ -10,8 +10,14 @@ import hashlib
 # Configuration
 PORT = int(os.environ.get("PORT", 8000))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_FILE = os.path.join(BASE_DIR, "marketplace.db")
-STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
+
+# Vercel-specific: Use /tmp for writable database
+if os.environ.get("VERCEL"):
+    DB_FILE = "/tmp/marketplace.db"
+    STATIC_DIR = os.path.join(BASE_DIR, "../frontend") # Adjust for Vercel file structure
+else:
+    DB_FILE = os.path.join(BASE_DIR, "marketplace.db")
+    STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "frontend")
 
 # Database Init
 def init_db():
@@ -318,3 +324,10 @@ if __name__ == "__main__":
     server = socketserver.TCPServer(("", PORT), MarketplaceHandler)
     print(f"Serving at http://localhost:{PORT}")
     server.serve_forever()
+
+# For Vercel Serverless (Run init_db on import)
+if os.environ.get("VERCEL"):
+    init_db()
+
+# Expose the handler for Vercel
+handler = MarketplaceHandler
