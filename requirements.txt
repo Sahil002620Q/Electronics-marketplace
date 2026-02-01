@@ -1,0 +1,2 @@
+# Python Standard Library only.
+# No external dependencies required for this MVP.
