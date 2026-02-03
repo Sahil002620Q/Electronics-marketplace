@@ -2,21 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Electronics Marketplace</title>
-<style>
-body{
-    font-family: Arial, sans-serif;
-    margin: 30px;
-    color:#222;
-}
-h1,h2{color:#0a58ca;}
-img{
-    max-width:100%;
-    border-radius:6px;
-    margin:10px 0;
-}
-a{color:#0a58ca;}
-</style>
 </head>
 <body>
 
@@ -51,8 +36,8 @@ electronics-marketplace.onrender.com
 <li>Deployment: Render</li>
 </ul>
 
-<h2>📄 License</h2>
-<p>MIT License</p>
+<h2>📄 Made with vibe coding</h2>
+<p></p>
 
 </body>
 </html>
