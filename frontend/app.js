@@ -69,34 +69,34 @@ const useAuth = () => useContext(AuthContext);
 const Navbar = ({ setPage }) => {
     const { user, logout } = useAuth();
     return (
-        <nav className="glass-panel sticky top-0 z-50 shadow-sm border-b border-white/20">
+        <nav className="glass-panel sticky top-0 z-50 shadow-lg border-b border-white/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
-                    <div className="flex cursor-pointer items-center" onClick={() => setPage('home')}>
-                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-dark">
+                    <div className="flex cursor-pointer items-center space-x-2" onClick={() => setPage('home')}>
+                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-cyan-400 animate-pulse-slow">
                             ElectroRecover
                         </span>
                     </div>
                     <div className="flex items-center space-x-4">
-                        <button onClick={() => setPage('home')} className="text-slate-600 hover:text-primary font-medium transition-colors">Browse</button>
+                        <button onClick={() => setPage('home')} className="text-slate-300 hover:text-white font-medium transition-colors hover:scale-105 transform">Browse</button>
                         {user ? (
                             <>
-                                <button onClick={() => setPage('create-listing')} className="btn-animated bg-primary text-white px-5 py-2 rounded-full font-medium hover:bg-primary-dark shadow-lg shadow-primary/30">
+                                <button onClick={() => setPage('create-listing')} className="btn-animated bg-gradient-to-r from-primary to-primary-dark text-white px-5 py-2 rounded-full font-medium shadow-lg shadow-primary/20 border border-white/10">
                                     + Sell Item
                                 </button>
-                                <button onClick={() => setPage('dashboard')} className="text-slate-600 hover:text-primary font-medium transition-colors">Dashboard</button>
+                                <button onClick={() => setPage('dashboard')} className="text-slate-300 hover:text-white font-medium transition-colors">Dashboard</button>
                                 {user.role === 'admin' && (
-                                    <button onClick={() => setPage('admin')} className="text-purple-600 hover:text-purple-800 font-bold">Admin</button>
+                                    <button onClick={() => setPage('admin')} className="text-purple-400 hover:text-purple-300 font-bold">Admin</button>
                                 )}
-                                <div className="flex items-center space-x-3 border-l pl-4 ml-4 border-slate-200">
-                                    <span className="text-sm font-medium text-slate-500">Hi, {user.name}</span>
-                                    <button onClick={logout} className="text-sm text-red-500 hover:text-red-700 font-medium">Logout</button>
+                                <div className="flex items-center space-x-3 border-l pl-4 ml-4 border-slate-700">
+                                    <span className="text-sm font-medium text-slate-400">Hi, {user.name}</span>
+                                    <button onClick={logout} className="text-sm text-red-400 hover:text-red-300 font-medium">Logout</button>
                                 </div>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => setPage('login')} className="text-slate-600 hover:text-primary font-medium transition-colors">Login</button>
-                                <button onClick={() => setPage('register')} className="btn-animated bg-slate-900 text-white px-5 py-2 rounded-full font-medium hover:bg-slate-800 shadow-lg">
+                                <button onClick={() => setPage('login')} className="text-slate-300 hover:text-white font-medium transition-colors">Login</button>
+                                <button onClick={() => setPage('register')} className="btn-animated bg-slate-700 text-white px-5 py-2 rounded-full font-medium hover:bg-slate-600 shadow-lg border border-slate-600">
                                     Register
                                 </button>
                             </>
@@ -110,22 +110,45 @@ const Navbar = ({ setPage }) => {
 
 // --- Product Details Modal ---
 const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+
     if (!listing) return null;
+
+    const photos = listing.photos && listing.photos.length > 0 ? listing.photos : [];
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row overflow-hidden animate-[slideUp_0.3s_ease-out]">
                 {/* Image Section */}
-                <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center p-4 relative min-h-[300px]">
+                <div className="w-full md:w-1/2 bg-gray-100 flex flex-col p-4 relative min-h-[300px]">
                     <button onClick={onClose} className="absolute top-4 left-4 bg-white/80 p-2 rounded-full md:hidden text-gray-800 hover:bg-white shadow z-10">
                         ✕ Close
                     </button>
-                    {listing.photos && listing.photos.length > 0 ? (
-                        <img src={listing.photos[0]} alt={listing.title} className="max-w-full max-h-[500px] object-contain shadow-lg rounded-lg" />
-                    ) : (
-                        <div className="text-gray-400 flex flex-col items-center">
-                            <span className="text-6xl mb-2">📷</span>
-                            <span className="font-medium">No Image Available</span>
+
+                    {/* Main Image */}
+                    <div className="flex-1 flex items-center justify-center overflow-hidden mb-4">
+                        {photos.length > 0 ? (
+                            <img src={photos[activeImageIndex]} alt={listing.title} className="max-w-full max-h-[400px] object-contain shadow-lg rounded-lg" />
+                        ) : (
+                            <div className="text-gray-400 flex flex-col items-center">
+                                <span className="text-6xl mb-2">📷</span>
+                                <span className="font-medium">No Image Available</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Thumbnails */}
+                    {photos.length > 1 && (
+                        <div className="flex space-x-2 overflow-x-auto pb-2 custom-scrollbar justify-center">
+                            {photos.map((photo, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveImageIndex(idx)}
+                                    className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${activeImageIndex === idx ? 'border-primary ring-2 ring-primary/30' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                >
+                                    <img src={photo} alt="" className="w-full h-full object-cover" />
+                                </button>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -253,13 +276,43 @@ const ListingCard = ({ listing, onView }) => {
 
 const HomePage = ({ setPage }) => {
     const [listings, setListings] = useState([]);
+    const [filteredListings, setFilteredListings] = useState([]);
     const [filters, setFilters] = useState({ category: '', condition: '' });
     const [showFilters, setShowFilters] = useState(false);
     const [selectedListing, setSelectedListing] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortBy, setSortBy] = useState('newest');
 
     useEffect(() => {
         fetchListings();
     }, [filters]);
+
+    useEffect(() => {
+        // Client-side filtering and sorting
+        let result = [...listings];
+
+        // Search
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            result = result.filter(l =>
+                l.title.toLowerCase().includes(q) ||
+                l.brand.toLowerCase().includes(q) ||
+                l.model.toLowerCase().includes(q)
+            );
+        }
+
+        // Sorting
+        if (sortBy === 'price_low') {
+            result.sort((a, b) => a.price - b.price);
+        } else if (sortBy === 'price_high') {
+            result.sort((a, b) => b.price - a.price);
+        } else {
+            // Newest (Default - Assuming ID correlates with time or added date)
+            result.sort((a, b) => b.id - a.id);
+        }
+
+        setFilteredListings(result);
+    }, [listings, searchQuery, sortBy]);
 
     const fetchListings = async () => {
         try {
@@ -269,6 +322,7 @@ const HomePage = ({ setPage }) => {
 
             const res = await api.get('/listings/', { params });
             setListings(res.data);
+            setFilteredListings(res.data);
         } catch (err) {
             console.error("Failed to fetch listings", err);
         }
@@ -287,31 +341,53 @@ const HomePage = ({ setPage }) => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Mobile Filter Toggle */}
-            <div className="md:hidden mb-4">
-                <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className="w-full flex items-center justify-between text-left bg-white p-3 rounded-lg shadow-sm border border-gray-200 font-semibold text-gray-700 active:scale-95 transition-transform"
-                >
-                    <span>🔍 Filters & Sort</span>
-                    <span className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}>▼</span>
-                </button>
+            {/* Search & Sort Bar */}
+            <div className="mb-8 flex flex-col md:flex-row gap-4 items-center">
+                <div className="relative w-full md:flex-1">
+                    <input
+                        type="text"
+                        placeholder="Search for phones, laptops, parts..."
+                        className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-transparent shadow-lg"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
+                    <span className="absolute left-4 top-3.5 text-slate-500">🔍</span>
+                </div>
+
+                <div className="w-full md:w-auto flex gap-4">
+                    <select
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="w-full md:w-48 bg-slate-800 border-slate-700 text-white rounded-xl py-3 px-4 focus:ring-primary shadow-lg"
+                    >
+                        <option value="newest">Latest Arrivals</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                    </select>
+
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="md:hidden flex items-center px-4 py-3 bg-slate-800 text-white rounded-xl border border-slate-700 shadow-lg"
+                    >
+                        <span className="mr-2">⚡ Filters</span>
+                    </button>
+                </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Sidebar Filters */}
                 <div className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-64 flex-shrink-0 transition-all duration-300`}>
-                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 sticky top-24">
+                    <div className="glass-panel p-5 rounded-xl border border-slate-700/50 sticky top-24">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-gray-900">Filters</h3>
-                            <button onClick={() => setFilters({ category: '', condition: '' })} className="text-xs text-primary font-medium hover:underline">Reset</button>
+                            <h3 className="font-bold text-white">Filters</h3>
+                            <button onClick={() => setFilters({ category: '', condition: '' })} className="text-xs text-primary-light font-medium hover:underline">Reset</button>
                         </div>
 
                         <div className="mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                            <label className="block text-sm font-medium text-slate-400 mb-2">Category</label>
                             <input
                                 type="text"
-                                className="w-full border-gray-300 rounded-lg shadow-sm p-2.5 border focus:ring-primary focus:border-primary transition-colors"
+                                className="w-full bg-slate-900/50 border-slate-600 rounded-lg shadow-inner p-2.5 text-sm text-white placeholder-slate-600 focus:ring-primary focus:border-primary transition-colors"
                                 placeholder="e.g. Phone, Laptop"
                                 value={filters.category}
                                 onChange={e => setFilters({ ...filters, category: e.target.value })}
@@ -319,19 +395,19 @@ const HomePage = ({ setPage }) => {
                         </div>
 
                         <div className="mb-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
-                            <div className="space-y-2">
+                            <label className="block text-sm font-medium text-slate-400 mb-2">Condition</label>
+                            <div className="space-y-3">
                                 {['', 'broken', 'for_parts', 'used', 'new'].map(cond => (
-                                    <label key={cond} className="flex items-center space-x-3 cursor-pointer group">
+                                    <label key={cond} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-slate-800/50 transition-colors">
                                         <input
                                             type="radio"
                                             name="condition"
                                             value={cond}
                                             checked={filters.condition === cond}
                                             onChange={e => setFilters({ ...filters, condition: e.target.value })}
-                                            className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                                            className="h-4 w-4 text-primary bg-slate-900 border-slate-600 focus:ring-primary focus:bg-primary"
                                         />
-                                        <span className="text-sm text-gray-600 group-hover:text-primary transition-colors">
+                                        <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
                                             {cond === '' ? 'All Conditions' : cond.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                         </span>
                                     </label>
@@ -344,7 +420,7 @@ const HomePage = ({ setPage }) => {
                 {/* Listing Grid */}
                 <div className="flex-1">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {listings.map(listing => (
+                        {filteredListings.map(listing => (
                             <ListingCard
                                 key={listing.id}
                                 listing={listing}
@@ -352,11 +428,12 @@ const HomePage = ({ setPage }) => {
                             />
                         ))}
                     </div>
-                    {listings.length === 0 && (
-                        <div className="text-center py-20 px-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                            <span className="text-4xl block mb-2">🔍</span>
-                            <p className="text-gray-500 font-medium">No listings found matching your criteria.</p>
-                            <button onClick={() => setFilters({ category: '', condition: '' })} className="text-primary font-bold mt-2 hover:underline">Clear Filters</button>
+                    {filteredListings.length === 0 && (
+                        <div className="text-center py-20 px-4 bg-slate-800/50 rounded-2xl border-2 border-dashed border-slate-700">
+                            <span className="text-4xl block mb-4 animate-bounce">🔍</span>
+                            <h3 className="text-xl font-bold text-white mb-2">No items found</h3>
+                            <p className="text-slate-400 font-medium">Try adjusting your search or filters.</p>
+                            <button onClick={() => { setFilters({ category: '', condition: '' }); setSearchQuery('') }} className="text-primary-light font-bold mt-4 hover:text-white transition-colors">Clear All Filters</button>
                         </div>
                     )}
                 </div>
@@ -529,21 +606,57 @@ const CreateListingPage = ({ setPage }) => {
     const [formData, setFormData] = useState({
         title: '', category: '', brand: '', model: '',
         condition: 'broken', price: '', location: '', description: '',
-        working_parts: ''
+        working_parts: '', photos: []
     });
+    const [loading, setLoading] = useState(false);
+
+    const handleImageUpload = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length + formData.photos.length > 5) {
+            alert("You can only upload up to 5 photos.");
+            return;
+        }
+
+        const newPhotos = [];
+        let processedCount = 0;
+
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                newPhotos.push(reader.result);
+                processedCount++;
+                if (processedCount === files.length) {
+                    setFormData(prev => ({
+                        ...prev,
+                        photos: [...prev.photos, ...newPhotos]
+                    }));
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const removePhoto = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            photos: prev.photos.filter((_, i) => i !== index)
+        }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             await api.post('/listings/', {
                 ...formData,
-                price: parseFloat(formData.price),
-                photos: [] // Placeholder for now
+                price: parseFloat(formData.price)
             });
             alert('Listing created!');
             setPage('dashboard');
         } catch (err) {
             alert('Failed to create listing: ' + (err.response?.data?.detail || err.message));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -551,6 +664,42 @@ const CreateListingPage = ({ setPage }) => {
         <div className="max-w-2xl mx-auto py-8 px-4">
             <h1 className="text-2xl font-bold mb-6">Create New Listing</h1>
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Photos (Max 5)</label>
+                        <div className="flex flex-wrap gap-4 items-start">
+                            {/* Photo Previews */}
+                            {formData.photos.map((photo, idx) => (
+                                <div key={idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group">
+                                    <img src={photo} alt="Preview" className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => removePhoto(idx)}
+                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+
+                            {/* Upload Button */}
+                            {formData.photos.length < 5 && (
+                                <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                    <span className="text-2xl text-gray-400">+</span>
+                                    <span className="text-xs text-gray-500 mt-1">Add Photo</span>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleImageUpload}
+                                    />
+                                </label>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Category</label>
@@ -613,8 +762,8 @@ const CreateListingPage = ({ setPage }) => {
                 </div>
 
                 <div className="pt-4">
-                    <button type="submit" className="w-full bg-primary text-white py-3 rounded-md hover:bg-blue-600 font-bold">
-                        Post Listing
+                    <button type="submit" disabled={loading} className="w-full bg-primary text-white py-3 rounded-md hover:bg-blue-600 font-bold disabled:opacity-50">
+                        {loading ? 'Posting...' : 'Post Listing'}
                     </button>
                     <button type="button" onClick={() => setPage('home')} className="w-full mt-2 text-gray-600 py-2 hover:bg-gray-50 rounded">
                         Cancel

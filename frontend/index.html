@@ -20,25 +20,37 @@
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Outfit', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#7c3aed', // Violet 600
-                        'primary-dark': '#6d28d9', // Violet 700
-                        'primary-light': '#8b5cf6', // Violet 500
-                        secondary: '#475569',
+                        primary: '#8b5cf6', // Violet 500 (Lighter for dark mode)
+                        'primary-dark': '#7c3aed', // Violet 600
+                        'primary-light': '#a78bfa', // Violet 400
+                        dark: {
+                            900: '#0f172a', // Slate 900
+                            800: '#1e293b', // Slate 800
+                            700: '#334155', // Slate 700
+                        }
                     },
                     animation: {
-                        'float': 'float 3s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'blob': 'blob 7s infinite',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-5px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     }
                 }
@@ -48,12 +60,35 @@
     <style>
         body {
             font-family: 'Outfit', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f1f5f9; /* Slate 100 */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 25%), 
+                radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.08) 0%, transparent 25%);
+            background-attachment: fixed;
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
         }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .btn-animated {
@@ -64,11 +99,23 @@
 
         .btn-animated:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px rgba(124, 58, 237, 0.5);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); /* Glow effect */
         }
 
         .btn-animated:active {
             transform: translateY(0);
+        }
+        
+        /* Custom inputs for dark mode */
+        input, select, textarea {
+            background-color: #1e293b !important; /* Slate 800 */
+            border-color: #334155 !important; /* Slate 700 */
+            color: #f8fafc !important; /* Slate 50 */
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #8b5cf6 !important; /* Violet 500 */
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
         }
     </style>
 </head>
