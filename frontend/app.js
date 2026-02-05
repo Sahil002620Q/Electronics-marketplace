@@ -2,7 +2,7 @@ const { useState, useEffect, createContext, useContext } = React;
 
 // --- API Configuration ---
 const api = axios.create({
-    baseURL: '', // Empty string uses current origin (works for both local and prod if served from same origin)
+    baseURL: '', // Empty string uses current origin
 });
 
 // Add token to requests if available
@@ -71,33 +71,36 @@ const Navbar = ({ setPage }) => {
     return (
         <nav className="glass-panel sticky top-0 z-50 shadow-lg border-b border-white/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    <div className="flex cursor-pointer items-center space-x-2" onClick={() => setPage('home')}>
-                        <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-cyan-400 animate-pulse-slow">
+                <div className="flex flex-col md:flex-row justify-between h-auto md:h-20 items-center py-3 md:py-0 space-y-3 md:space-y-0">
+                    <div className="flex cursor-pointer items-center space-x-3 group" onClick={() => setPage('home')}>
+                        <div className="bg-primary/20 p-2 rounded-lg group-hover:bg-primary/30 transition-colors">
+                            <span className="text-2xl">⚡</span>
+                        </div>
+                        <span className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary animate-pulse-slow tracking-tight">
                             ElectroRecover
                         </span>
                     </div>
-                    <div className="flex items-center space-x-4">
-                        <button onClick={() => setPage('home')} className="text-slate-300 hover:text-white font-medium transition-colors hover:scale-105 transform">Browse</button>
+                    <div className="flex items-center space-x-2 md:space-x-6 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar justify-center md:justify-end">
+                        <button onClick={() => setPage('home')} className="text-sm md:text-base text-slate-300 hover:text-white font-medium transition-colors whitespace-nowrap">Browse</button>
                         {user ? (
                             <>
-                                <button onClick={() => setPage('create-listing')} className="btn-animated bg-gradient-to-r from-primary to-primary-dark text-white px-5 py-2 rounded-full font-medium shadow-lg shadow-primary/20 border border-white/10">
-                                    + Sell Item
-                                </button>
-                                <button onClick={() => setPage('dashboard')} className="text-slate-300 hover:text-white font-medium transition-colors">Dashboard</button>
+                                <button onClick={() => setPage('dashboard')} className="text-sm md:text-base text-slate-300 hover:text-white font-medium transition-colors whitespace-nowrap">Dashboard</button>
                                 {user.role === 'admin' && (
-                                    <button onClick={() => setPage('admin')} className="text-purple-400 hover:text-purple-300 font-bold">Admin</button>
+                                    <button onClick={() => setPage('admin')} className="text-sm md:text-base text-secondary hover:text-cyan-300 font-bold tracking-wide whitespace-nowrap">Admin</button>
                                 )}
-                                <div className="flex items-center space-x-3 border-l pl-4 ml-4 border-slate-700">
-                                    <span className="text-sm font-medium text-slate-400">Hi, {user.name}</span>
-                                    <button onClick={logout} className="text-sm text-red-400 hover:text-red-300 font-medium">Logout</button>
+                                <div className="flex items-center space-x-3 md:space-x-4 border-l pl-3 md:pl-6 ml-2 border-slate-700/50">
+                                    <span className="text-xs md:text-sm font-medium text-slate-400 hidden sm:inline">Hi, <span className="text-white">{user.name.split(' ')[0]}</span></span>
+                                    <button onClick={() => setPage('create-listing')} className="btn-primary text-white px-4 md:px-6 py-1.5 md:py-2.5 text-sm md:text-base rounded-xl font-bold shadow-lg shadow-primary/20 border border-white/10 hover:border-white/20 whitespace-nowrap">
+                                        + Sell
+                                    </button>
+                                    <button onClick={logout} className="text-sm text-red-400 hover:text-red-300 font-medium transition-colors whitespace-nowrap">Logout</button>
                                 </div>
                             </>
                         ) : (
                             <>
-                                <button onClick={() => setPage('login')} className="text-slate-300 hover:text-white font-medium transition-colors">Login</button>
-                                <button onClick={() => setPage('register')} className="btn-animated bg-slate-700 text-white px-5 py-2 rounded-full font-medium hover:bg-slate-600 shadow-lg border border-slate-600">
-                                    Register
+                                <button onClick={() => setPage('login')} className="text-sm md:text-base text-slate-300 hover:text-white font-medium transition-colors whitespace-nowrap">Login</button>
+                                <button onClick={() => setPage('register')} className="btn-primary text-white px-4 md:px-6 py-2 md:py-2.5 text-sm md:text-base rounded-xl font-bold shadow-lg border border-white/10 whitespace-nowrap">
+                                    Join Now
                                 </button>
                             </>
                         )}
@@ -108,7 +111,6 @@ const Navbar = ({ setPage }) => {
     );
 };
 
-// --- Product Details Modal ---
 const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
     const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -117,34 +119,34 @@ const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
     const photos = listing.photos && listing.photos.length > 0 ? listing.photos : [];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row overflow-hidden animate-[slideUp_0.3s_ease-out]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+            <div className="glass-panel w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl flex flex-col md:flex-row animate-slide-up border border-slate-700/50 ring-1 ring-white/10">
                 {/* Image Section */}
-                <div className="w-full md:w-1/2 bg-gray-100 flex flex-col p-4 relative min-h-[300px]">
-                    <button onClick={onClose} className="absolute top-4 left-4 bg-white/80 p-2 rounded-full md:hidden text-gray-800 hover:bg-white shadow z-10">
-                        ✕ Close
+                <div className="w-full md:w-1/2 bg-dark-950/50 flex flex-col p-6 relative min-h-[400px] justify-center">
+                    <button onClick={onClose} className="absolute top-4 left-4 bg-black/40 backdrop-blur p-2 rounded-full md:hidden text-white hover:bg-white/20 z-10">
+                        ✕
                     </button>
 
                     {/* Main Image */}
-                    <div className="flex-1 flex items-center justify-center overflow-hidden mb-4">
+                    <div className="flex-1 flex items-center justify-center overflow-hidden mb-6 relative group">
                         {photos.length > 0 ? (
-                            <img src={photos[activeImageIndex]} alt={listing.title} className="max-w-full max-h-[400px] object-contain shadow-lg rounded-lg" />
+                            <img src={photos[activeImageIndex]} alt={listing.title} className="max-w-full max-h-[500px] object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" />
                         ) : (
-                            <div className="text-gray-400 flex flex-col items-center">
-                                <span className="text-6xl mb-2">📷</span>
-                                <span className="font-medium">No Image Available</span>
+                            <div className="text-slate-600 flex flex-col items-center">
+                                <span className="text-6xl mb-4 opacity-50">📷</span>
+                                <span className="font-medium text-lg">No Images Uploaded</span>
                             </div>
                         )}
                     </div>
 
                     {/* Thumbnails */}
                     {photos.length > 1 && (
-                        <div className="flex space-x-2 overflow-x-auto pb-2 custom-scrollbar justify-center">
+                        <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar justify-center px-4">
                             {photos.map((photo, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setActiveImageIndex(idx)}
-                                    className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all ${activeImageIndex === idx ? 'border-primary ring-2 ring-primary/30' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                    className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300 ${activeImageIndex === idx ? 'border-secondary ring-2 ring-secondary/30 scale-110' : 'border-transparent opacity-60 hover:opacity-100 hover:border-slate-600'}`}
                                 >
                                     <img src={photo} alt="" className="w-full h-full object-cover" />
                                 </button>
@@ -154,65 +156,68 @@ const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
                 </div>
 
                 {/* Details Section */}
-                <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
+                <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col bg-slate-900/40">
+                    <div className="flex justify-between items-start mb-6">
                         <div>
-                            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-2">
+                            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold bg-primary/20 text-primary-light mb-3 border border-primary/20 uppercase tracking-wider">
                                 {listing.category}
                             </span>
-                            <h2 className="text-2xl font-bold text-gray-900 leading-tight">{listing.title}</h2>
-                            <p className="text-sm text-gray-500 mt-1">{listing.brand} • {listing.model}</p>
+                            <h2 className="text-3xl font-bold text-white leading-tight mb-2">{listing.title}</h2>
+                            <p className="text-slate-400 font-medium">{listing.brand} • {listing.model}</p>
                         </div>
-                        <button onClick={onClose} className="hidden md:block text-gray-400 hover:text-gray-600 text-2xl leading-none">
+                        <button onClick={onClose} className="hidden md:block text-slate-400 hover:text-white text-3xl leading-none w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
                             &times;
                         </button>
                     </div>
 
-                    <div className="mb-6">
-                        <span className="text-3xl font-bold text-slate-800">${listing.price}</span>
+                    <div className="mb-8 p-4 rounded-2xl bg-gradient-to-r from-slate-800/50 to-transparent border border-white/5">
+                        <span className="text-xs text-slate-400 uppercase tracking-widest block mb-1">Price</span>
+                        <span className="text-4xl font-bold text-secondary tracking-tight">₹{Math.floor(listing.price).toLocaleString('en-IN')}</span>
                     </div>
 
-                    <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">Condition</h3>
-                            <div className="flex items-center space-x-2">
-                                <span className={`text-lg font-bold ${listing.condition === 'broken' ? 'text-red-500' : 'text-green-600'}`}>
-                                    {listing.condition.replace('_', ' ').toUpperCase()}
-                                </span>
+                    <div className="space-y-6 flex-1 overflow-y-auto pr-4 custom-scrollbar">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-slate-800/40 p-4 rounded-2xl border border-white/5">
+                                <h3 className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Condition</h3>
+                                <div className={`text-lg font-bold ${listing.condition === 'broken' ? 'text-red-400' : 'text-emerald-400'}`}>
+                                    {listing.condition.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                                </div>
+                            </div>
+                            <div className="bg-slate-800/40 p-4 rounded-2xl border border-white/5">
+                                <h3 className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Location</h3>
+                                <div className="text-lg font-medium text-slate-200 truncate">
+                                    📍 {listing.location}
+                                </div>
                             </div>
                         </div>
 
                         <div>
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">Description</h3>
-                            <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{listing.description}</p>
+                            <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Description & Details</h3>
+                            <p className="text-slate-300 leading-relaxed font-light text-lg">{listing.description}</p>
                         </div>
 
                         {listing.working_parts && (
                             <div>
-                                <h3 className="text-sm font-semibold text-gray-900 mb-2 uppercase tracking-wide">Working Parts</h3>
-                                <p className="text-green-700 bg-green-50 p-3 rounded-lg border border-green-100 text-sm">
-                                    ✅ {listing.working_parts}
-                                </p>
+                                <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Working Components</h3>
+                                <div className="text-emerald-300 bg-emerald-950/30 p-4 rounded-xl border border-emerald-900/50 flex items-start space-x-3">
+                                    <span className="text-xl">✅</span>
+                                    <span className="font-medium">{listing.working_parts}</span>
+                                </div>
                             </div>
                         )}
-
-                        <div className="flex items-center text-sm text-gray-500 pt-2 border-t border-gray-100">
-                            <span className="mr-2">📍 Location:</span>
-                            <span className="font-medium text-gray-800">{listing.location}</span>
-                        </div>
                     </div>
 
-                    <div className="pt-6 mt-4 border-t border-gray-100">
+                    <div className="pt-8 mt-4 border-t border-white/5">
                         {listing.status === 'active' ? (
                             <button
                                 onClick={() => onRequest(listing.id)}
-                                className="w-full btn-animated bg-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-primary-dark shadow-xl shadow-primary/20"
+                                className="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 border border-white/20 hover:scale-[1.02] transition-transform"
                             >
-                                Request to Buy
+                                Send Purchase Request
                             </button>
                         ) : (
-                            <button disabled className="w-full bg-slate-200 text-slate-400 py-4 rounded-xl font-bold text-lg cursor-not-allowed">
-                                Not Available
+                            <button disabled className="w-full bg-slate-800 text-slate-500 py-4 rounded-2xl font-bold text-lg cursor-not-allowed border border-slate-700">
+                                Currently Unavailable
                             </button>
                         )}
                     </div>
@@ -224,48 +229,52 @@ const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
 
 const ListingCard = ({ listing, onView }) => {
     return (
-        <div className="btn-animated bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl group flex flex-col h-full cursor-pointer" onClick={() => onView(listing)}>
-            <div className="h-48 bg-slate-100 flex items-center justify-center relative overflow-hidden">
+        <div className="glass-panel-hover rounded-3xl overflow-hidden cursor-pointer group transition-all duration-500 flex flex-col h-full border border-slate-700/50 bg-slate-800/40 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10" onClick={() => onView(listing)}>
+            <div className="h-56 bg-dark-950/50 flex items-center justify-center relative overflow-hidden group-hover:bg-dark-900/80 transition-colors">
                 {listing.photos && listing.photos.length > 0 ? (
-                    <img src={listing.photos[0]} alt={listing.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <img src={listing.photos[0]} alt={listing.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" />
                 ) : (
-                    <div className="text-slate-300 flex flex-col items-center">
-                        <span className="text-4xl mb-2">📷</span>
-                        <span className="text-sm font-medium">No Image</span>
+                    <div className="text-slate-600 flex flex-col items-center">
+                        <span className="text-5xl mb-2 opacity-30 group-hover:opacity-50 transition-opacity">📷</span>
                     </div>
                 )}
-                <div className="absolute top-3 right-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm ${listing.status === 'active' ? 'bg-green-500 text-white' : 'bg-slate-500 text-white'}`}>
+                <div className="absolute top-4 right-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-md border border-white/10 ${listing.status === 'active' ? 'bg-emerald-500/80 text-white' : 'bg-slate-500/80 text-white'}`}>
                         {listing.status}
                     </span>
                 </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
             </div>
-            <div className="p-5 flex flex-col flex-1">
-                <div className="flex justify-between items-start mb-2">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary truncate max-w-[50%]">
+
+            <div className="p-6 flex flex-col flex-1 relative">
+                <div className="flex justify-between items-start mb-3">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary-light border border-primary/10 truncate max-w-[60%]">
                         {listing.category}
                     </span>
-                    <span className="text-xl font-bold text-slate-900">${listing.price}</span>
+                    <span className="text-xl font-bold text-secondary tracking-tight">₹{Math.floor(listing.price).toLocaleString('en-IN')}</span>
                 </div>
 
-                <h3 className="text-lg font-bold text-slate-800 mb-1 group-hover:text-primary transition-colors line-clamp-2">{listing.title}</h3>
-                <p className="text-sm text-slate-500 mb-4">{listing.brand} • {listing.model}</p>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-light transition-colors line-clamp-2">{listing.title}</h3>
+                <p className="text-sm text-slate-400 mb-6 font-medium">{listing.brand} • {listing.model}</p>
 
-                <div className="space-y-2 mb-4 flex-1">
-                    <div className="flex items-center text-sm">
-                        <span className="text-slate-400 w-20 flex-shrink-0">Condition:</span>
-                        <span className={`font-medium ${listing.condition === 'broken' ? 'text-red-500' : 'text-green-500'}`}>
+                <div className="space-y-3 mb-6 flex-1">
+                    <div className="flex items-center text-sm p-2 rounded-lg bg-slate-800/50 border border-white/5">
+                        <span className="text-slate-400 w-20 flex-shrink-0">Condition</span>
+                        <span className={`font-bold ${listing.condition === 'broken' ? 'text-red-400' : 'text-emerald-400'}`}>
                             {listing.condition.replace('_', ' ').toUpperCase()}
                         </span>
                     </div>
-                    <div className="flex items-center text-sm">
-                        <span className="text-slate-400 w-20 flex-shrink-0">Location:</span>
-                        <span className="text-slate-600 truncate">{listing.location}</span>
+                    <div className="flex items-center text-sm p-2 rounded-lg bg-slate-800/50 border border-white/5">
+                        <span className="text-slate-400 w-20 flex-shrink-0">Location</span>
+                        <span className="text-slate-300 truncate">{listing.location}</span>
                     </div>
                 </div>
 
-                <div className="text-center text-sm font-semibold text-primary mt-auto pt-2 border-t border-slate-50">
-                    View Details →
+                <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between text-sm group/btn">
+                    <span className="text-slate-400">View Details</span>
+                    <div className="bg-white/5 p-2 rounded-full group-hover/btn:bg-primary group-hover/btn:text-white transition-all duration-300">
+                        <span className="block transform group-hover/btn:-rotate-45 transition-transform">→</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -288,10 +297,7 @@ const HomePage = ({ setPage }) => {
     }, [filters]);
 
     useEffect(() => {
-        // Client-side filtering and sorting
         let result = [...listings];
-
-        // Search
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             result = result.filter(l =>
@@ -300,17 +306,13 @@ const HomePage = ({ setPage }) => {
                 l.model.toLowerCase().includes(q)
             );
         }
-
-        // Sorting
         if (sortBy === 'price_low') {
             result.sort((a, b) => a.price - b.price);
         } else if (sortBy === 'price_high') {
             result.sort((a, b) => b.price - a.price);
         } else {
-            // Newest (Default - Assuming ID correlates with time or added date)
             result.sort((a, b) => b.id - a.id);
         }
-
         setFilteredListings(result);
     }, [listings, searchQuery, sortBy]);
 
@@ -319,7 +321,6 @@ const HomePage = ({ setPage }) => {
             const params = {};
             if (filters.category) params.category = filters.category;
             if (filters.condition) params.condition = filters.condition;
-
             const res = await api.get('/listings/', { params });
             setListings(res.data);
             setFilteredListings(res.data);
@@ -332,7 +333,7 @@ const HomePage = ({ setPage }) => {
         try {
             await api.post('/requests/', { listing_id: listingId });
             alert("Buy request sent successfully! Check your dashboard.");
-            setSelectedListing(null); // Close modal on success
+            setSelectedListing(null);
         } catch (err) {
             alert(err.response?.data?.detail || "Failed to send request. You might need to login.");
             if (err.response?.status === 401) setPage('login');
@@ -340,75 +341,81 @@ const HomePage = ({ setPage }) => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Search & Sort Bar */}
-            <div className="mb-8 flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative w-full md:flex-1">
-                    <input
-                        type="text"
-                        placeholder="Search for phones, laptops, parts..."
-                        className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:ring-2 focus:ring-primary focus:border-transparent shadow-lg"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                    />
-                    <span className="absolute left-4 top-3.5 text-slate-500">🔍</span>
-                </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            {/* Hero Section */}
+            <div className="mb-12 text-center animate-fade-in">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                    Find Value in <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Broken Tech</span>
+                </h1>
+                <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+                    The premium marketplace for buying and selling repairable electronics and parts.
+                </p>
 
-                <div className="w-full md:w-auto flex gap-4">
-                    <select
-                        value={sortBy}
-                        onChange={e => setSortBy(e.target.value)}
-                        className="w-full md:w-48 bg-slate-800 border-slate-700 text-white rounded-xl py-3 px-4 focus:ring-primary shadow-lg"
-                    >
-                        <option value="newest">Latest Arrivals</option>
-                        <option value="price_low">Price: Low to High</option>
-                        <option value="price_high">Price: High to Low</option>
-                    </select>
-
-                    <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className="md:hidden flex items-center px-4 py-3 bg-slate-800 text-white rounded-xl border border-slate-700 shadow-lg"
-                    >
-                        <span className="mr-2">⚡ Filters</span>
-                    </button>
+                {/* Search Bar */}
+                <div className="max-w-3xl mx-auto relative group z-10">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-500"></div>
+                    <div className="relative flex items-center bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2">
+                        <span className="pl-4 text-2xl">🔍</span>
+                        <input
+                            type="text"
+                            placeholder="Search by device, brand, or model..."
+                            className="bg-transparent border-none text-white text-lg w-full px-4 py-3 placeholder-slate-500 focus:ring-0"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                        />
+                        <div className="hidden md:flex border-l border-white/10 pl-2">
+                            <select
+                                value={sortBy}
+                                onChange={e => setSortBy(e.target.value)}
+                                className="bg-transparent border-none text-slate-300 text-sm focus:ring-0 cursor-pointer hover:text-white transition-colors py-3"
+                            >
+                                <option value="newest">Latest Arrivals</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-8">
-                {/* Sidebar Filters */}
-                <div className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-64 flex-shrink-0 transition-all duration-300`}>
-                    <div className="glass-panel p-5 rounded-xl border border-slate-700/50 sticky top-24">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-bold text-white">Filters</h3>
-                            <button onClick={() => setFilters({ category: '', condition: '' })} className="text-xs text-primary-light font-medium hover:underline">Reset</button>
+                {/* Filter Sidebar */}
+                <div className="hidden md:block w-64 flex-shrink-0 animate-slide-up">
+                    <div className="glass-panel p-6 rounded-2xl sticky top-28">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="font-bold text-white text-lg">Filters</h3>
+                            <button onClick={() => setFilters({ category: '', condition: '' })} className="text-xs text-primary-light font-bold hover:text-white transition-colors uppercase tracking-wide">Reset</button>
                         </div>
 
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Category</label>
+                        <div className="mb-8">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Category</label>
                             <input
                                 type="text"
-                                className="w-full bg-slate-900/50 border-slate-600 rounded-lg shadow-inner p-2.5 text-sm text-white placeholder-slate-600 focus:ring-primary focus:border-primary transition-colors"
-                                placeholder="e.g. Phone, Laptop"
+                                className="w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/50"
+                                placeholder="e.g. Phone"
                                 value={filters.category}
                                 onChange={e => setFilters({ ...filters, category: e.target.value })}
                             />
                         </div>
 
-                        <div className="mb-2">
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Condition</label>
-                            <div className="space-y-3">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Condition</label>
+                            <div className="space-y-2">
                                 {['', 'broken', 'for_parts', 'used', 'new'].map(cond => (
-                                    <label key={cond} className="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-slate-800/50 transition-colors">
+                                    <label key={cond} className={`flex items-center space-x-3 cursor-pointer p-3 rounded-xl transition-all ${filters.condition === cond ? 'bg-primary/20 border border-primary/30' : 'hover:bg-white/5 border border-transparent'}`}>
                                         <input
                                             type="radio"
                                             name="condition"
                                             value={cond}
                                             checked={filters.condition === cond}
                                             onChange={e => setFilters({ ...filters, condition: e.target.value })}
-                                            className="h-4 w-4 text-primary bg-slate-900 border-slate-600 focus:ring-primary focus:bg-primary"
+                                            className="hidden"
                                         />
-                                        <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
-                                            {cond === '' ? 'All Conditions' : cond.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${filters.condition === cond ? 'border-primary' : 'border-slate-500'}`}>
+                                            {filters.condition === cond && <div className="w-2 h-2 rounded-full bg-primary"></div>}
+                                        </div>
+                                        <span className={`text-sm font-medium ${filters.condition === cond ? 'text-white' : 'text-slate-400'}`}>
+                                            {cond === '' ? 'All' : cond.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                         </span>
                                     </label>
                                 ))}
@@ -417,8 +424,8 @@ const HomePage = ({ setPage }) => {
                     </div>
                 </div>
 
-                {/* Listing Grid */}
-                <div className="flex-1">
+                {/* Listings Grid */}
+                <div className="flex-1 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredListings.map(listing => (
                             <ListingCard
@@ -429,17 +436,18 @@ const HomePage = ({ setPage }) => {
                         ))}
                     </div>
                     {filteredListings.length === 0 && (
-                        <div className="text-center py-20 px-4 bg-slate-800/50 rounded-2xl border-2 border-dashed border-slate-700">
-                            <span className="text-4xl block mb-4 animate-bounce">🔍</span>
-                            <h3 className="text-xl font-bold text-white mb-2">No items found</h3>
-                            <p className="text-slate-400 font-medium">Try adjusting your search or filters.</p>
-                            <button onClick={() => { setFilters({ category: '', condition: '' }); setSearchQuery('') }} className="text-primary-light font-bold mt-4 hover:text-white transition-colors">Clear All Filters</button>
+                        <div className="glass-panel text-center py-24 rounded-3xl border border-dashed border-slate-700 mt-4">
+                            <div className="bg-slate-800/50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-5xl">🔍</span>
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">No items found</h3>
+                            <p className="text-slate-400 font-medium">Try adjusting your filters or search query.</p>
+                            <button onClick={() => { setFilters({ category: '', condition: '' }); setSearchQuery('') }} className="mt-6 text-primary-light font-bold hover:text-white transition-colors">Clear All Filters</button>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Product Details Modal */}
             {selectedListing && (
                 <ProductDetailsModal
                     listing={selectedListing}
@@ -468,38 +476,43 @@ const LoginPage = ({ setPage }) => {
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <div className="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md animate-[float_6s_ease-in-out_infinite]">
-                <h2 className="text-3xl font-bold mb-6 text-center text-slate-800">Welcome Back</h2>
-                {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm border border-red-100">{error}</div>}
+        <div className="min-h-[85vh] flex items-center justify-center p-4 relative overflow-hidden">
+            <div className="glass-panel p-10 rounded-3xl w-full max-w-md animate-fade-in relative z-10 border border-white/10 shadow-2xl">
+                <div className="text-center mb-8">
+                    <span className="text-4xl mb-4 block">👋</span>
+                    <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+                    <p className="text-slate-400">Sign in to continue trading.</p>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
+                {error && <div className="bg-red-500/10 text-red-400 p-4 rounded-xl mb-6 text-sm border border-red-500/20 text-center font-medium">{error}</div>}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Email Address</label>
+                        <label className="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide">Email</label>
                         <input
                             type="email"
                             required
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3 transition-all"
+                            className="w-full rounded-xl px-4 py-3.5"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Password</label>
+                        <label className="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-wide">Password</label>
                         <input
                             type="password"
                             required
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3 transition-all"
+                            className="w-full rounded-xl px-4 py-3.5"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                         />
                     </div>
-                    <button type="submit" className="w-full btn-animated bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-dark shadow-lg shadow-primary/30">
+                    <button type="submit" className="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg">
                         Sign In
                     </button>
                 </form>
-                <div className="mt-6 text-center text-sm text-slate-500">
-                    New here? <button onClick={() => setPage('register')} className="text-primary font-bold hover:underline">Create an account</button>
+                <div className="mt-8 text-center text-slate-500">
+                    New here? <button onClick={() => setPage('register')} className="text-primary-light font-bold hover:text-white transition-colors">Create Account</button>
                 </div>
             </div>
         </div>
@@ -522,80 +535,51 @@ const RegisterPage = ({ setPage }) => {
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center py-12 p-4">
-            <div className="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md">
-                <h2 className="text-3xl font-bold mb-6 text-center text-slate-800">Join the Market</h2>
-                {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm border border-red-100">{error}</div>}
+        <div className="min-h-[90vh] flex items-center justify-center py-12 p-4">
+            <div className="glass-panel p-10 rounded-3xl w-full max-w-md animate-fade-in border border-white/10 shadow-2xl">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
+                    <p className="text-slate-400">Join the premium tech marketplace.</p>
+                </div>
+
+                {error && <div className="bg-red-500/10 text-red-400 p-4 rounded-xl mb-6 text-sm border border-red-500/20 text-center">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Full Name</label>
-                        <input
-                            type="text"
-                            required
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3"
-                            value={formData.name}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Full Name</label>
+                            <input type="text" required className="w-full rounded-xl px-4 py-3" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                        </div>
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
+                            <input type="email" required className="w-full rounded-xl px-4 py-3" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                        </div>
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Phone (WhatsApp)</label>
+                            <input type="tel" required placeholder="+91..." className="w-full rounded-xl px-4 py-3" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                        </div>
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Password</label>
+                            <input type="password" required className="w-full rounded-xl px-4 py-3" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Role</label>
+                            <select className="w-full rounded-xl px-4 py-3" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })}>
+                                <option value="buyer">Buyer</option>
+                                <option value="seller">Seller</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Location</label>
+                            <input type="text" required className="w-full rounded-xl px-4 py-3" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
-                        <input
-                            type="email"
-                            required
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3"
-                            value={formData.email}
-                            onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Phone Number (for WhatsApp)</label>
-                        <input
-                            type="tel"
-                            required
-                            placeholder="+91 9876543210"
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3"
-                            value={formData.phone}
-                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Password</label>
-                        <input
-                            type="password"
-                            required
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3"
-                            value={formData.password}
-                            onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">I want to</label>
-                        <select
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3"
-                            value={formData.role}
-                            onChange={e => setFormData({ ...formData, role: e.target.value })}
-                        >
-                            <option value="buyer">Buy Parts & Devices</option>
-                            <option value="seller">Sell Broken Items</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-600 mb-1">Location</label>
-                        <input
-                            type="text"
-                            required
-                            className="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-3"
-                            value={formData.location}
-                            onChange={e => setFormData({ ...formData, location: e.target.value })}
-                        />
-                    </div>
-                    <button type="submit" className="w-full btn-animated bg-primary text-white py-3 rounded-xl font-bold hover:bg-primary-dark shadow-lg shadow-primary/30 mt-2">
-                        Create Account
+                    <button type="submit" className="w-full btn-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg mt-4">
+                        Get Started
                     </button>
                 </form>
-                <div className="mt-6 text-center text-sm text-slate-500">
-                    Already a member? <button onClick={() => setPage('login')} className="text-primary font-bold hover:underline">Log in</button>
+                <div className="mt-8 text-center text-slate-500">
+                    Already member? <button onClick={() => setPage('login')} className="text-primary-light font-bold hover:text-white transition-colors">Log in</button>
                 </div>
             </div>
         </div>
@@ -609,6 +593,11 @@ const CreateListingPage = ({ setPage }) => {
         working_parts: '', photos: []
     });
     const [loading, setLoading] = useState(false);
+
+    // Calculate Market Price Live
+    const sellerPrice = parseFloat(formData.price) || 0;
+    const marketPrice = Math.round((sellerPrice * 1.10) + 20);
+    const potentialProfit = marketPrice - sellerPrice;
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -649,9 +638,9 @@ const CreateListingPage = ({ setPage }) => {
         try {
             await api.post('/listings/', {
                 ...formData,
-                price: parseFloat(formData.price)
+                price: parseFloat(formData.price) // Sends expected Seller Price
             });
-            alert('Listing created!');
+            alert('Listing created! Admin will review shortly.');
             setPage('dashboard');
         } catch (err) {
             alert('Failed to create listing: ' + (err.response?.data?.detail || err.message));
@@ -661,67 +650,63 @@ const CreateListingPage = ({ setPage }) => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto py-8 px-4">
-            <h1 className="text-2xl font-bold mb-6">Create New Listing</h1>
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Photos (Max 5)</label>
-                        <div className="flex flex-wrap gap-4 items-start">
-                            {/* Photo Previews */}
-                            {formData.photos.map((photo, idx) => (
-                                <div key={idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group">
-                                    <img src={photo} alt="Preview" className="w-full h-full object-cover" />
-                                    <button
-                                        type="button"
-                                        onClick={() => removePhoto(idx)}
-                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            ))}
+        <div className="max-w-3xl mx-auto py-12 px-4 animate-slide-up">
+            <h1 className="text-3xl font-bold mb-8 text-white">Create New Listing</h1>
+            <form onSubmit={handleSubmit} className="glass-panel p-8 rounded-3xl border border-white/10 space-y-8">
+                <div>
+                    <label className="block text-sm font-bold text-slate-400 mb-4 uppercase tracking-wide">Device Photos (Max 5)</label>
+                    <div className="flex flex-wrap gap-4 items-start">
+                        {formData.photos.map((photo, idx) => (
+                            <div key={idx} className="relative w-28 h-28 rounded-2xl overflow-hidden border border-white/20 group shadow-md">
+                                <img src={photo} alt="Preview" className="w-full h-full object-cover" />
+                                <button
+                                    type="button"
+                                    onClick={() => removePhoto(idx)}
+                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1.5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
 
-                            {/* Upload Button */}
-                            {formData.photos.length < 5 && (
-                                <label className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                    <span className="text-2xl text-gray-400">+</span>
-                                    <span className="text-xs text-gray-500 mt-1">Add Photo</span>
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        className="hidden"
-                                        onChange={handleImageUpload}
-                                    />
-                                </label>
-                            )}
-                        </div>
+                        {formData.photos.length < 5 && (
+                            <label className="w-28 h-28 flex flex-col items-center justify-center border-2 border-dashed border-slate-600 rounded-2xl cursor-pointer hover:border-primary hover:bg-slate-800/50 transition-all group">
+                                <span className="text-3xl text-slate-500 group-hover:text-primary transition-colors">+</span>
+                                <span className="text-xs text-slate-500 mt-2 font-medium">Add Photo</span>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload}
+                                />
+                            </label>
+                        )}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Category</label>
-                        <input type="text" required className="w-full border p-2 rounded" placeholder="Smartphone"
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Category</label>
+                        <input type="text" required className="w-full rounded-xl px-4 py-3" placeholder="Smartphone"
                             value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Brand</label>
-                        <input type="text" className="w-full border p-2 rounded" placeholder="Apple"
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Brand</label>
+                        <input type="text" className="w-full rounded-xl px-4 py-3" placeholder="Apple"
                             value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })} />
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Model</label>
-                        <input type="text" className="w-full border p-2 rounded" placeholder="iPhone 12"
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Model</label>
+                        <input type="text" className="w-full rounded-xl px-4 py-3" placeholder="iPhone 12"
                             value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Condition</label>
-                        <select className="w-full border p-2 rounded"
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Condition</label>
+                        <select className="w-full rounded-xl px-4 py-3"
                             value={formData.condition} onChange={e => setFormData({ ...formData, condition: e.target.value })}>
                             <option value="broken">Broken / Damaged</option>
                             <option value="for_parts">For Parts Only</option>
@@ -731,42 +716,45 @@ const CreateListingPage = ({ setPage }) => {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Title</label>
-                    <input type="text" required className="w-full border p-2 rounded" placeholder="Broken Screen iPhone 12 Pro Max"
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Title</label>
+                    <input type="text" required className="w-full rounded-xl px-4 py-3" placeholder="Broken Screen iPhone 12 Pro Max"
                         value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Working Parts (if any)</label>
-                    <textarea className="w-full border p-2 rounded" placeholder="Motherboard, Battery seem fine..."
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Working Parts (Optional)</label>
+                    <textarea className="w-full rounded-xl px-4 py-3 h-20" placeholder="e.g. Motherboard, Battery, Rear Camera..."
                         value={formData.working_parts} onChange={e => setFormData({ ...formData, working_parts: e.target.value })} />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea required className="w-full border p-2 rounded h-24" placeholder="Detailed description of the item..."
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Detailed Description</label>
+                    <textarea required className="w-full rounded-xl px-4 py-3 h-32" placeholder="Describe the damage and condition in detail..."
                         value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-800/50 p-6 rounded-2xl border border-white/10">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Price ($)</label>
-                        <input type="number" step="0.01" required className="w-full border p-2 rounded" placeholder="0.00"
+                        <label className="block text-xs font-bold text-emerald-400 uppercase mb-2">You Receive (₹)</label>
+                        <input type="number" step="1" required className="w-full rounded-xl px-4 py-3 font-bold text-lg text-emerald-400 border-emerald-500/50 focus:border-emerald-400" placeholder="0"
                             value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
+                        <p className="text-xs text-slate-500 mt-2">Enter the amount you want to get appropriately.</p>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Location</label>
-                        <input type="text" required className="w-full border p-2 rounded" placeholder="City, State"
-                            value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} />
+                    <div className="flex flex-col justify-center">
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Listing Price on Market (₹)</label>
+                        <div className="text-3xl font-bold text-white tracking-tight">
+                            ₹{marketPrice.toLocaleString('en-IN')}
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">Includes platform fees & commission.</p>
                     </div>
                 </div>
 
-                <div className="pt-4">
-                    <button type="submit" disabled={loading} className="w-full bg-primary text-white py-3 rounded-md hover:bg-blue-600 font-bold disabled:opacity-50">
-                        {loading ? 'Posting...' : 'Post Listing'}
-                    </button>
-                    <button type="button" onClick={() => setPage('home')} className="w-full mt-2 text-gray-600 py-2 hover:bg-gray-50 rounded">
+                <div className="pt-6 flex gap-4">
+                    <button type="button" onClick={() => setPage('home')} className="flex-1 btn-secondary text-slate-300 py-4 rounded-xl font-bold hover:text-white">
                         Cancel
+                    </button>
+                    <button type="submit" disabled={loading} className="flex-1 btn-primary text-white py-4 rounded-xl font-bold disabled:opacity-50">
+                        {loading ? 'Posting...' : 'Post Listing'}
                     </button>
                 </div>
             </form>
@@ -786,26 +774,12 @@ const DashboardPage = () => {
 
     const loadDashboardData = async () => {
         try {
-            // In a real app we'd have a specific endpoint for my listings
-            // Using logic: fetch all and filter by seller_id (not efficient but works for now)
-            // Or use an endpoint if we made one. We haven't made a specific "my-listings" endpoint, 
-            // but we can add one or just use correct endpoint. 
-            // Actually, we should probably add one, but for now let's just use the requests endpoints which we DID make on "my-requests" and "incoming".
-
-            // Note: listings router has generic filter, but getting "my" listings specifically might need a query param or separate endpoint.
-            // Let's leave listings empty for now or try to fetch generic and filter client side (bad practice but works for demo).
-            // Better: update backend to support "seller_id" filter.
-
             const reqSent = await api.get('/requests/my-requests');
             setSentRequests(reqSent.data);
-
             const reqInc = await api.get('/requests/incoming');
             setIncomingRequests(reqInc.data);
-
-            // Hack for listings:
             const listRes = await api.get('/listings/?limit=100');
             setMyListings(listRes.data.filter(l => l.seller_id === user.id));
-
         } catch (err) {
             console.error(err);
         }
@@ -822,90 +796,87 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        <div className="max-w-7xl mx-auto px-4 py-12">
+            <h1 className="text-3xl font-bold mb-8 text-white">Dashboard</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Incoming Requests (As Seller) */}
-                <div className="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 className="text-xl font-bold mb-4 text-slate-800 flex items-center">
-                        <span className="mr-2">📥</span> Incoming Buy Requests
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                {/* Incoming Requests */}
+                <div className="glass-panel p-6 rounded-3xl border border-white/5">
+                    <h2 className="text-xl font-bold mb-6 text-white flex items-center">
+                        <span className="mr-3 bg-slate-800 p-2 rounded-lg">📥</span> Incoming Buy Requests
                     </h2>
                     {incomingRequests.length === 0 ? (
                         <p className="text-slate-500 italic">No incoming requests yet.</p>
                     ) : (
                         <div className="space-y-4">
                             {incomingRequests.map(req => (
-                                <div key={req.id} className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                                <div key={req.id} className="bg-slate-800/50 p-6 rounded-2xl border border-white/5 shadow-sm">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                                 {req.buyer_name ? req.buyer_name[0].toUpperCase() : 'B'}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-800">{req.buyer_name}</p>
-                                                <p className="text-xs text-slate-500">{req.buyer_location}</p>
+                                                <p className="font-bold text-white">Buyer</p>
+                                                <p className="text-xs text-slate-400">{req.buyer_location}</p>
                                             </div>
                                         </div>
-                                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${req.status === 'pending' ? 'bg-amber-100 text-amber-700' : req.status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${req.status === 'pending' ? 'bg-amber-500/20 text-amber-500' : req.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'}`}>
                                             {req.status}
                                         </span>
                                     </div>
 
-                                    <div className="bg-slate-50 p-3 rounded-lg text-sm text-slate-600 mb-4">
-                                        <p>Wants to buy your listing <span className="font-semibold text-primary">#{req.listing_id}</span></p>
-                                        <p className="text-xs text-slate-400 mt-1">{new Date(req.created_at).toLocaleDateString()}</p>
+                                    <div className="bg-slate-900/50 p-4 rounded-xl text-sm text-slate-300 mb-4 border border-white/5">
+                                        <p>Wants to buy <span className="font-semibold text-primary-light">Listing #{req.listing_id}</span></p>
+                                        <p className="text-xs text-slate-500 mt-1">{new Date(req.created_at).toLocaleDateString()}</p>
                                     </div>
 
-                                    {/* Contact Actions */}
-                                    <div className="flex flex-col space-y-2">
-                                        {req.buyer_phone && (
-                                            <a href={`https://wa.me/${req.buyer_phone.replace(/\D/g, '')}`} target="_blank" className="flex items-center justify-center space-x-2 w-full bg-[#25D366] text-white py-2 rounded-lg hover:bg-[#128C7E] font-medium transition-colors">
-                                                <span>💬</span> <span>Chat on WhatsApp</span>
-                                            </a>
+                                    <div className="bg-slate-900/40 p-3 rounded-lg text-sm text-slate-400 mb-4 border border-white/5 text-center">
+                                        ℹ️ Contact details masked until Admin approval.
+                                    </div>
+
+                                    <div className="mt-4 flex gap-2">
+                                        {req.status === 'pending' && (
+                                            <>
+                                                <button onClick={() => handleUpdateStatus(req.id, 'accept')} className="flex-1 bg-emerald-500 text-white py-2 rounded-xl font-bold text-sm hover:bg-emerald-600">Accept Trade</button>
+                                                <button onClick={() => handleUpdateStatus(req.id, 'reject')} className="flex-1 bg-red-500/20 text-red-500 py-2 rounded-xl font-bold text-sm hover:bg-red-500/30">Reject</button>
+                                            </>
                                         )}
-                                        <div className="flex space-x-2">
-                                            <a href={`mailto:${req.buyer_email}`} className="flex-1 flex items-center justify-center space-x-1 bg-slate-100 text-slate-700 py-2 rounded-lg hover:bg-slate-200 text-sm font-medium transition-colors">
-                                                <span>✉️</span> <span>Email</span>
-                                            </a>
-                                            {req.buyer_phone && (
-                                                <a href={`tel:${req.buyer_phone}`} className="flex-1 flex items-center justify-center space-x-1 bg-slate-100 text-slate-700 py-2 rounded-lg hover:bg-slate-200 text-sm font-medium transition-colors">
-                                                    <span>📞</span> <span>Call</span>
-                                                </a>
-                                            )}
-                                        </div>
+                                        {req.status === 'accepted' && (
+                                            <div className="flex-1 bg-emerald-500/10 text-emerald-400 py-2 rounded-xl font-bold text-sm text-center border border-emerald-500/20">
+                                                Accepted - System Processing
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {req.status === 'pending' && (
-                                        <div className="mt-4 pt-3 border-t border-slate-100 flex space-x-3">
-                                            <button onClick={() => handleUpdateStatus(req.id, 'accept')} className="flex-1 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 font-medium text-sm">Accept</button>
-                                            <button onClick={() => handleUpdateStatus(req.id, 'reject')} className="flex-1 bg-red-100 text-red-600 py-2 rounded-lg hover:bg-red-200 font-medium text-sm">Reject</button>
-                                        </div>
-                                    )}
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
 
-                {/* Sent Requests (As Buyer) */}
-                <div className="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 className="text-xl font-bold mb-4 text-slate-800 flex items-center">
-                        <span className="mr-2">📤</span> My Sent Requests
+                {/* Sent Requests */}
+                <div className="glass-panel p-6 rounded-3xl border border-white/5">
+                    <h2 className="text-xl font-bold mb-6 text-white flex items-center">
+                        <span className="mr-3 bg-slate-800 p-2 rounded-lg">📤</span> Sent Requests
                     </h2>
                     {sentRequests.length === 0 ? (
-                        <p className="text-slate-500 italic">You haven't made any requests.</p>
+                        <p className="text-slate-500 italic">No sent requests.</p>
                     ) : (
                         <div className="space-y-4">
                             {sentRequests.map(req => (
-                                <div key={req.id} className="bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-center hover:shadow-sm">
-                                    <div>
-                                        <span className="font-bold text-slate-700">Listing #{req.listing_id}</span>
-                                        <p className="text-xs text-slate-400">{new Date(req.created_at).toLocaleDateString()}</p>
+                                <div key={req.id} className="bg-slate-800/50 p-4 rounded-xl border border-white/5 flex flex-col group hover:bg-slate-800 transition-colors">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="font-bold text-white group-hover:text-primary-light transition-colors">Listing #{req.listing_id}</span>
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase ${req.status === 'pending' ? 'bg-amber-500/10 text-amber-500' : req.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                            {req.status}
+                                        </span>
                                     </div>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${req.status === 'pending' ? 'bg-amber-100 text-amber-700' : req.status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-slate-100'}`}>
-                                        {req.status}
-                                    </span>
+                                    <p className="text-xs text-slate-500">{new Date(req.created_at).toLocaleDateString()}</p>
+                                    {req.status === 'accepted' && (
+                                        <div className="mt-2 text-xs text-emerald-400 bg-emerald-500/5 p-2 rounded border border-emerald-500/10">
+                                            Offer Accepted! Admin will contact you shortly to finalize payment and shipping.
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -914,19 +885,27 @@ const DashboardPage = () => {
             </div>
 
             {/* My Listings */}
-            <div className="mt-8 glass-panel p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 className="text-xl font-bold mb-6 text-slate-800">📦 My Listings</h2>
+            <div className="glass-panel p-8 rounded-3xl border border-white/5">
+                <h2 className="text-2xl font-bold mb-6 text-white">📦 My Active Listings</h2>
                 {myListings.length === 0 ? (
-                    <p className="text-gray-500">No listings active.</p>
+                    <div className="text-center py-10">
+                        <p className="text-slate-500 mb-4">You haven't posted any items yet.</p>
+                        <button className="text-primary-light font-bold hover:underline">Create your first listing</button>
+                    </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {myListings.map(l => (
-                            <div key={l.id} className="border p-4 rounded-md">
-                                <h3 className="font-medium">{l.title}</h3>
-                                <div className="flex justify-between mt-2 text-sm text-gray-600">
-                                    <span>${l.price}</span>
-                                    <span>{l.status}</span>
+                            <div key={l.id} className="bg-slate-900/50 p-4 rounded-2xl border border-white/5 relative group hover:border-primary/50 transition-colors">
+                                <h3 className="font-bold text-white truncate mb-1">{l.title}</h3>
+                                <div className="flex justify-between items-end mt-2">
+                                    <div className="text-sm text-slate-400">
+                                        Listed: <span className="text-white">₹{l.price}</span>
+                                    </div>
+                                    <div className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-md">
+                                        You get: ₹{l.seller_price || '?'}
+                                    </div>
                                 </div>
+                                <span className={`absolute top-4 right-4 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${l.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-600 text-slate-300'}`}>{l.status}</span>
                             </div>
                         ))}
                     </div>
@@ -951,7 +930,7 @@ const AdminPage = () => {
             setLoading(true);
             const [usersRes, listingsRes] = await Promise.all([
                 api.get('/admin/users'),
-                api.get('/listings/')
+                api.get('/admin/listings_full') // New endpoint with profit info
             ]);
             setUsers(usersRes.data);
             setListings(listingsRes.data);
@@ -983,38 +962,60 @@ const AdminPage = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading Admin Panel...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center text-white font-bold animate-pulse">Loading Admin Panel...</div>;
+
+    const totalProfit = listings.reduce((sum, l) => sum + (l.profit || 0), 0);
+    const potentialProfit = listings.filter(l => l.status === 'active').reduce((sum, l) => sum + (l.profit || 0), 0);
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8 text-slate-800">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-8 text-white">Admin Dashboard</h1>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-slate-800 to-slate-900">
+                    <h3 className="text-slate-400 text-sm font-bold uppercase mb-2">Total Users</h3>
+                    <p className="text-3xl font-bold text-white">{users.length}</p>
+                </div>
+                <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-emerald-900/40 to-slate-900">
+                    <h3 className="text-emerald-400 text-sm font-bold uppercase mb-2">Active Listings Value</h3>
+                    <p className="text-3xl font-bold text-white">₹{potentialProfit.toLocaleString('en-IN')}</p>
+                    <p className="text-xs text-slate-500 mt-1">Projected Platform Profit</p>
+                </div>
+                <div className="glass-panel p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-primary/20 to-slate-900">
+                    <h3 className="text-primary-light text-sm font-bold uppercase mb-2">Total Listings</h3>
+                    <p className="text-3xl font-bold text-white">{listings.length}</p>
+                </div>
+            </div>
 
             {/* Users Management */}
-            <div className="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-                <h2 className="text-xl font-bold mb-4 text-slate-800">Manage Users</h2>
+            <div className="glass-panel p-6 rounded-2xl border border-white/5 mb-8">
+                <h2 className="text-xl font-bold mb-4 text-white">Manage Users</h2>
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-slate-800/50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Name</th>
+                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Email</th>
+                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Contact</th>
+                                <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Role</th>
+                                <th className="px-6 py-3 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="divide-y divide-white/10">
                             {users.map(u => (
                                 <tr key={u.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{u.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{u.email}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}`}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{u.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{u.email}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{u.phone || 'N/A'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${u.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
                                             {u.role}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         {u.id !== user.id && (
-                                            <button onClick={() => handleDeleteUser(u.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                                            <button onClick={() => handleDeleteUser(u.id)} className="text-red-400 hover:text-red-300">Delete</button>
                                         )}
                                     </td>
                                 </tr>
@@ -1025,26 +1026,39 @@ const AdminPage = () => {
             </div>
 
             {/* Listings Management */}
-            <div className="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 className="text-xl font-bold mb-4 text-slate-800">Manage Listings</h2>
+            <div className="glass-panel p-6 rounded-2xl border border-white/5">
+                <h2 className="text-xl font-bold mb-4 text-white">Manage Listings & Commissions</h2>
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-slate-800/50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller ID</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Item</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Seller Expects</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Listed Price</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-emerald-400 uppercase tracking-wider">Profit</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="divide-y divide-white/10">
                             {listings.map(l => (
                                 <tr key={l.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{l.title}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{l.seller_id}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{l.status}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+                                        {l.title}
+                                        <div className="text-xs text-slate-500">ID: {l.id} • {new Date(l.created_at).toLocaleDateString()}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">₹{l.seller_price}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-bold">₹{l.price}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">
+                                        +₹{(l.profit || 0).toFixed(0)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase ${l.status === 'active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-700 text-slate-400'}`}>
+                                            {l.status}
+                                        </span>
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => handleDeleteListing(l.id)} className="text-red-600 hover:text-red-900">Delete</button>
+                                        <button onClick={() => handleDeleteListing(l.id)} className="text-red-400 hover:text-red-300">Delete</button>
                                     </td>
                                 </tr>
                             ))}
@@ -1063,9 +1077,9 @@ const App = () => {
 
     return (
         <AuthProvider>
-            <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+            <div className="min-h-screen text-slate-100 font-sans selection:bg-primary/30 selection:text-white">
                 <Navbar setPage={setPage} />
-                <main>
+                <main className="pb-20">
                     {page === 'home' && <HomePage setPage={setPage} />}
                     {page === 'login' && <LoginPage setPage={setPage} />}
                     {page === 'register' && <RegisterPage setPage={setPage} />}

@@ -42,7 +42,8 @@ def init_db():
                 brand TEXT,
                 model TEXT,
                 condition TEXT,
-                price REAL,
+                seller_price REAL, -- Amount seller receives
+                price REAL, -- Amount buyer pays (Display Price)
                 location TEXT,
                 description TEXT,
                 status TEXT DEFAULT 'active',
@@ -62,11 +63,17 @@ def init_db():
             );
         ''')
         
-        # Migration: Add phone column if it doesn't exist
+        # Migration: Add columns if they don't exist
         try:
             c.execute("ALTER TABLE users ADD COLUMN phone TEXT")
         except sqlite3.OperationalError:
-            pass 
+            pass
+        try:
+            c.execute("ALTER TABLE listings ADD COLUMN seller_price REAL")
+            # Backfill existing listings: seller_price = price
+            c.execute("UPDATE listings SET seller_price = price WHERE seller_price IS NULL")
+        except sqlite3.OperationalError:
+            pass
 
         # Check if admin exists
         c.execute("SELECT id FROM users WHERE role='admin'")
@@ -84,7 +91,7 @@ def init_db():
 class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         super().end_headers()
 
@@ -132,7 +139,9 @@ class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 conn.row_factory = sqlite3.Row
                 c = conn.cursor()
-                c.execute("SELECT * FROM listings ORDER BY created_at DESC")
+                # Determine user role from token (optional) to show/hide seller_price?
+                # For now, public API hides seller_price unless we want it for client math, but safer to hide.
+                c.execute("SELECT id, seller_id, title, category, brand, model, condition, price, location, description, status, working_parts, photos, created_at FROM listings ORDER BY created_at DESC")
                 listings = [dict(row) for row in c.fetchall()]
                 for l in listings:
                     l['photos'] = json.loads(l['photos']) if l['photos'] else []
@@ -140,7 +149,8 @@ class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
                 conn.close()
             self.send_json(listings)
             return
-        # API: My Requests
+
+        # API: My Requests (As Buyer)
         if path == "/requests/my-requests":
             user, error = self.get_user_from_token()
             if error:
@@ -157,7 +167,7 @@ class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json(requests)
             return
 
-        # API: Incoming Requests
+        # API: Incoming Requests (As Seller)
         if path == "/requests/incoming":
             user, error = self.get_user_from_token()
             if error:
@@ -168,11 +178,12 @@ class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
                 conn.row_factory = sqlite3.Row
                 c = conn.cursor()
                 c.execute('''
-                    SELECT br.*, u.name as buyer_name, u.email as buyer_email, u.phone as buyer_phone, u.location as buyer_location
+                    SELECT br.*, u.name as buyer_name, u.location as buyer_location
                     FROM buy_requests br
                     JOIN users u ON br.buyer_id = u.id
                     WHERE br.seller_id=?
                 ''', (user['id'],))
+                # Note: REMOVED u.email, u.phone from SELECT to enforce privacy
                 requests = [dict(row) for row in c.fetchall()]
             finally:
                 conn.close()
@@ -207,6 +218,29 @@ class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
             finally:
                 conn.close()
             self.send_json(users)
+            return
+            
+        # API: Admin - Get All Listings (With Profit Info)
+        if path == "/admin/listings_full":
+            user, error = self.get_user_from_token()
+            if error:
+                self.send_error(401, error)
+                return
+            if user['role'] != 'admin':
+                self.send_error(403, "Admin access required")
+                return
+            
+            conn = sqlite3.connect(DB_FILE, timeout=10)
+            try:
+                conn.row_factory = sqlite3.Row
+                c = conn.cursor()
+                c.execute("SELECT * FROM listings ORDER BY created_at DESC")
+                listings = [dict(row) for row in c.fetchall()]
+                for l in listings:
+                    l['profit'] = (l['price'] or 0) - (l['seller_price'] or (l['price'] or 0)) 
+            finally:
+                conn.close()
+            self.send_json(listings)
             return
 
         self.send_error(404)
@@ -269,15 +303,21 @@ class MarketplaceHandler(http.server.SimpleHTTPRequestHandler):
                     return
                 conn = sqlite3.connect(DB_FILE, timeout=10)
                 try:
+                    seller_price = float(body['price']) # The input 'price' is what the seller WANTS
+                    # Markup Logic: +10% + 20 flat fee
+                    display_price = (seller_price * 1.10) + 20 
+                    # Rounding
+                    display_price = round(display_price, 2)
+                    
                     c = conn.cursor()
-                    c.execute('''INSERT INTO listings (seller_id, title, category, brand, model, condition, price, location, description, working_parts, photos)
-                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    c.execute('''INSERT INTO listings (seller_id, title, category, brand, model, condition, seller_price, price, location, description, working_parts, photos)
+                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                               (user['id'], body['title'], body['category'], body['brand'], body['model'], 
-                               body['condition'], body['price'], body['location'], body['description'], 
+                               body['condition'], seller_price, display_price, body['location'], body['description'], 
                                body['working_parts'], json.dumps(body['photos'])))
                     conn.commit()
                     lid = c.lastrowid
-                    self.send_json({"id": lid, "status": "active"})
+                    self.send_json({"id": lid, "status": "active", "price": display_price})
                 finally:
                     conn.close()
                 return
