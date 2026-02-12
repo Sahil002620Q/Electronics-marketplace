@@ -101,8 +101,15 @@ const CustomCursor = () => {
         };
     }, []);
 
-    // Only render on non-touch devices to avoid annoyance? 
-    // For now, render always as requested.
+    // Only render on non-touch devices
+    const [isTouch, setIsTouch] = useState(false);
+
+    useEffect(() => {
+        setIsTouch(!window.matchMedia('(hover: hover)').matches);
+    }, []);
+
+    if (isTouch) return null;
+
     return ReactDOM.createPortal(
         <>
             <div className="cursor-dot" style={{ left: `${position.x}px`, top: `${position.y}px` }}></div>
@@ -124,40 +131,40 @@ const CustomCursor = () => {
 const Navbar = ({ setPage }) => {
     const { user, logout } = useAuth();
     return (
-        <nav className="glass-panel sticky top-0 z-50 shadow-lg border-b border-white/5">
+        <nav className="glass-panel sticky top-0 z-50 border-b border-white/5 hidden md:block backdrop-blur-md bg-[#09090b]/80">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row justify-between h-auto md:h-20 items-center py-3 md:py-0 space-y-3 md:space-y-0">
+                <div className="flex justify-between h-20 items-center">
                     <div className="flex cursor-pointer items-center space-x-3 group" onClick={() => setPage('home')}>
                         <div className="bg-primary/20 p-2 rounded-lg group-hover:bg-primary/30 transition-colors">
                             <span className="text-2xl">⚡</span>
                         </div>
-                        <span className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary animate-pulse-slow tracking-tight">
+                        <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400 tracking-tighter">
                             ElectroRecover
                         </span>
                     </div>
-                    <div className="flex items-center space-x-2 md:space-x-6 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 hide-scrollbar justify-center md:justify-end">
-                        <button onClick={() => setPage('home')} className="text-sm md:text-base text-slate-300 hover:text-white font-medium transition-colors whitespace-nowrap">Browse</button>
+                    <div className="flex items-center space-x-8">
+                        <button onClick={() => setPage('home')} className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Browse</button>
                         {user ? (
                             <>
-                                <button onClick={() => setPage('dashboard')} className="text-sm md:text-base text-slate-300 hover:text-white font-medium transition-colors whitespace-nowrap">Dashboard</button>
+                                <button onClick={() => setPage('dashboard')} className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Dashboard</button>
                                 {user.role === 'admin' && (
-                                    <button onClick={() => setPage('admin')} className="text-sm md:text-base text-secondary hover:text-cyan-300 font-bold tracking-wide whitespace-nowrap">Admin</button>
+                                    <button onClick={() => setPage('admin')} className="text-sm font-extrabold text-primary hover:text-primary-light tracking-wide">ADMIN</button>
                                 )}
-                                <div className="flex items-center space-x-3 md:space-x-4 border-l pl-3 md:pl-6 ml-2 border-slate-700/50">
-                                    <span className="text-xs md:text-sm font-medium text-slate-400 hidden sm:inline">Hi, <span className="text-white">{user.name.split(' ')[0]}</span></span>
-                                    <button onClick={() => setPage('create-listing')} className="btn-primary text-white px-4 md:px-6 py-1.5 md:py-2.5 text-sm md:text-base rounded-xl font-bold shadow-lg shadow-primary/20 border border-white/10 hover:border-white/20 whitespace-nowrap">
-                                        + Sell
+                                <div className="flex items-center space-x-4 border-l pl-6 ml-2 border-white/5">
+                                    <span className="text-sm font-medium text-zinc-500">Hi, <span className="text-white font-bold">{user.name.split(' ')[0]}</span></span>
+                                    <button onClick={() => setPage('create-listing')} className="btn-primary text-black px-6 py-2.5 text-sm rounded-full shadow-lg shadow-white/5 hover:shadow-white/20 whitespace-nowrap">
+                                        + Sell Item
                                     </button>
-                                    <button onClick={logout} className="text-sm text-red-400 hover:text-red-300 font-medium transition-colors whitespace-nowrap">Logout</button>
+                                    <button onClick={logout} className="text-sm text-zinc-500 hover:text-red-400 font-medium transition-colors">Logout</button>
                                 </div>
                             </>
                         ) : (
-                            <>
-                                <button onClick={() => setPage('login')} className="text-sm md:text-base text-slate-300 hover:text-white font-medium transition-colors whitespace-nowrap">Login</button>
-                                <button onClick={() => setPage('register')} className="btn-primary text-white px-4 md:px-6 py-2 md:py-2.5 text-sm md:text-base rounded-xl font-bold shadow-lg border border-white/10 whitespace-nowrap">
+                            <div className="flex items-center space-x-4">
+                                <button onClick={() => setPage('login')} className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Login</button>
+                                <button onClick={() => setPage('register')} className="btn-primary text-black px-6 py-2.5 text-sm rounded-full shadow-lg shadow-white/5">
                                     Join Now
                                 </button>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -166,14 +173,60 @@ const Navbar = ({ setPage }) => {
     );
 };
 
+const MobileTopBar = ({ setPage }) => {
+    return (
+        <div className="md:hidden sticky top-0 z-50 bg-[#09090b]/90 backdrop-blur-xl border-b border-white/5 px-4 py-3 flex justify-between items-center">
+            <div className="flex cursor-pointer items-center space-x-2" onClick={() => setPage('home')}>
+                <div className="bg-primary/20 p-1.5 rounded-lg">
+                    <span className="text-xl">⚡</span>
+                </div>
+                <span className="text-lg font-bold text-white tracking-tight">
+                    ElectroRecover
+                </span>
+            </div>
+            {/* Placeholder for notification or profile icon if needed */}
+            <div className="w-8"></div>
+        </div>
+    );
+};
+
+const MobileBottomNav = ({ setPage, page }) => {
+    const { user } = useAuth();
+
+    const NavItem = ({ target, icon, label, active }) => (
+        <button
+            onClick={() => setPage(target)}
+            className={`flex flex-col items-center justify-center w-full py-2 transition-all duration-300 ${active ? 'text-primary' : 'text-zinc-600 hover:text-zinc-400'}`}
+        >
+            <span className={`text-xl mb-1 transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
+            <span className="text-[10px] font-bold tracking-wide">{label}</span>
+        </button>
+    );
+
+    return (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#09090b] border-t border-white/5 pb-safe shadow-2xl">
+            <div className="flex justify-around items-center h-16">
+                <NavItem target="home" icon="🏠" label="Home" active={page === 'home'} />
+                <NavItem target="create-listing" icon="➕" label="Sell" active={page === 'create-listing'} />
+                {user ? (
+                    <>
+                        <NavItem target="dashboard" icon="📊" label="Dashboard" active={page === 'dashboard'} />
+                    </>
+                ) : (
+                    <NavItem target="login" icon="🔐" label="Login" active={page === 'login' || page === 'register'} />
+                )}
+            </div>
+        </div>
+    );
+};
+
 const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
-    const { user } = useAuth(); // Need user to check ownership
+    const { user } = useAuth();
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [hasRequested, setHasRequested] = useState(false);
 
     useEffect(() => {
         if (user && listing) {
-            // Check if user has already sent a request for this listing
             api.get('/requests/my-requests').then(res => {
                 const existing = res.data.find(r => r.listing_id === listing.id && r.status === 'pending');
                 if (existing) setHasRequested(true);
@@ -186,34 +239,35 @@ const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
     const photos = listing.photos && listing.photos.length > 0 ? listing.photos : [];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-            <div className="glass-panel w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-3xl shadow-2xl flex flex-col md:flex-row animate-slide-up border border-slate-700/50 ring-1 ring-white/10">
-                {/* Image Section */}
-                <div className="w-full md:w-1/2 bg-dark-950/50 flex flex-col p-6 relative min-h-[400px] justify-center">
-                    <button onClick={onClose} className="absolute top-4 left-4 bg-black/40 backdrop-blur p-2 rounded-full md:hidden text-white hover:bg-white/20 z-10">
-                        ✕
-                    </button>
+        <div className="fixed inset-0 z-[100] flex md:items-center justify-center bg-black/90 backdrop-blur-xl animate-fade-in md:p-8">
+            <div className="bg-[#09090b] w-full max-w-7xl h-full md:h-[90vh] md:rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden relative animate-scale-up border border-white/5">
 
-                    {/* Main Image */}
-                    <div className="flex-1 flex items-center justify-center overflow-hidden mb-6 relative group">
+                {/* Close Button (Mobile Absolute / Desktop Absolute) */}
+                <button onClick={onClose} className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur p-2 rounded-full text-white hover:bg-white/20 transition-all">
+                    <span className="text-xl">✕</span>
+                </button>
+
+                {/* Left: Image Gallery */}
+                <div className="w-full md:w-[55%] bg-black relative flex flex-col items-center justify-center p-4 md:p-8 group">
+                    <div className="flex-1 w-full flex items-center justify-center relative">
                         {photos.length > 0 ? (
-                            <img src={photos[activeImageIndex]} alt={listing.title} className="max-w-full max-h-[500px] object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" />
+                            <img src={photos[activeImageIndex]} alt={listing.title} className="max-w-full max-h-[40vh] md:max-h-[70vh] object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" />
                         ) : (
-                            <div className="text-slate-600 flex flex-col items-center">
-                                <span className="text-6xl mb-4 opacity-50">📷</span>
-                                <span className="font-medium text-lg">No Images Uploaded</span>
+                            <div className="text-zinc-600 flex flex-col items-center">
+                                <span className="text-6xl mb-4 opacity-30">📷</span>
+                                <span className="font-medium text-lg">No Images</span>
                             </div>
                         )}
                     </div>
 
                     {/* Thumbnails */}
                     {photos.length > 1 && (
-                        <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar justify-center px-4">
+                        <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar justify-center w-full px-4 mt-6 absolute bottom-6 z-10">
                             {photos.map((photo, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setActiveImageIndex(idx)}
-                                    className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300 ${activeImageIndex === idx ? 'border-secondary ring-2 ring-secondary/30 scale-110' : 'border-transparent opacity-60 hover:opacity-100 hover:border-slate-600'}`}
+                                    className={`relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300 ${activeImageIndex === idx ? 'border-primary ring-2 ring-primary/30 scale-105 opacity-100' : 'border-transparent opacity-50 hover:opacity-100 hover:border-zinc-700 bg-zinc-900'}`}
                                 >
                                     <img src={photo} alt="" className="w-full h-full object-cover" />
                                 </button>
@@ -222,91 +276,86 @@ const ProductDetailsModal = ({ listing, onClose, onRequest }) => {
                     )}
                 </div>
 
-                {/* Details Section */}
-                <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col bg-slate-900/40">
-                    <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold bg-primary/20 text-primary-light mb-3 border border-primary/20 uppercase tracking-wider">
-                                {listing.category}
+                {/* Right: Details */}
+                <div className="w-full md:w-[45%] flex flex-col bg-[#09090b] border-l border-white/5 relative">
+                    <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar pb-32 md:pb-10">
+                        {/* Header */}
+                        <div className="mb-8">
+                            <span className="inline-flex items-center space-x-2 text-xs font-bold text-primary-light uppercase tracking-widest mb-3">
+                                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                <span>{listing.category}</span>
                             </span>
-                            <h2 className="text-3xl font-bold text-white leading-tight mb-2">{listing.title}</h2>
-                            <p className="text-slate-400 font-medium">{listing.brand} • {listing.model}</p>
+                            <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-3 tracking-tight">{listing.title}</h2>
+                            <p className="text-zinc-400 font-medium text-lg">{listing.brand} {listing.model}</p>
                         </div>
-                        <button onClick={onClose} className="hidden md:block text-slate-400 hover:text-white text-3xl leading-none w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
-                            &times;
-                        </button>
-                    </div>
 
-                    <div className="mb-8 p-4 rounded-2xl bg-gradient-to-r from-slate-800/50 to-transparent border border-white/5">
-                        <span className="text-xs text-slate-400 uppercase tracking-widest block mb-1">Price</span>
-                        <span className="text-4xl font-bold text-secondary tracking-tight">₹{Math.floor(listing.price).toLocaleString('en-IN')}</span>
-                    </div>
-
-                    <div className="space-y-6 flex-1 overflow-y-auto pr-4 custom-scrollbar">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-slate-800/40 p-4 rounded-2xl border border-white/5">
-                                <h3 className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Condition</h3>
-                                <div className={`text-lg font-bold ${listing.condition === 'broken' ? 'text-red-400' : 'text-emerald-400'}`}>
-                                    {listing.condition.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                                </div>
-                            </div>
-                            <div className="bg-slate-800/40 p-4 rounded-2xl border border-white/5">
-                                <h3 className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Location</h3>
-                                <div className="text-lg font-medium text-slate-200 truncate">
-                                    📍 {listing.location}
-                                </div>
+                        {/* Price Tag */}
+                        <div className="mb-10 flex items-end space-x-4 border-b border-white/5 pb-8">
+                            <div className="flex flex-col">
+                                <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">Price</span>
+                                <span className="text-5xl font-bold text-primary tracking-tighter">₹{Math.floor(listing.price).toLocaleString('en-IN')}</span>
                             </div>
                         </div>
 
-                        <div>
-                            <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Description & Details</h3>
-                            <p className="text-slate-300 leading-relaxed font-light text-lg">{listing.description}</p>
+                        {/* Specs Grid */}
+                        <div className="grid grid-cols-2 gap-4 mb-8">
+                            <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Condition</h3>
+                                <div className={`text-lg font-bold ${listing.condition === 'broken' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                    {listing.condition.replace('_', ' ').toUpperCase()}
+                                </div>
+                            </div>
+                            <div className="bg-zinc-900/50 p-4 rounded-xl border border-white/5">
+                                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Location</h3>
+                                <div className="text-lg font-medium text-zinc-200 truncate">{listing.location}</div>
+                            </div>
                         </div>
 
-                        {listing.working_parts && (
+                        {/* Description */}
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wide">Working Components</h3>
-                                <div className="text-emerald-300 bg-emerald-950/30 p-4 rounded-xl border border-emerald-900/50 flex items-start space-x-3">
-                                    <span className="text-xl">✅</span>
-                                    <span className="font-medium">{listing.working_parts}</span>
-                                </div>
+                                <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Details</h3>
+                                <p className="text-zinc-400 leading-relaxed text-lg font-light">{listing.description}</p>
                             </div>
-                        )}
+
+                            {listing.working_parts && (
+                                <div>
+                                    <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Working Logic</h3>
+                                    <div className="text-emerald-300 bg-emerald-950/10 p-5 rounded-2xl border border-emerald-900/20 flex items-start space-x-3">
+                                        <span className="text-xl">✅</span>
+                                        <span className="font-medium text-base">{listing.working_parts}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="pt-8 mt-4 border-t border-white/5">
+                    {/* Sticky Bottom Action (Mobile) / Footer Action (Desktop) */}
+                    <div className="bg-[#09090b]/80 backdrop-blur-md p-6 border-t border-white/10 absolute md:static bottom-0 left-0 right-0 z-20">
                         {listing.status === 'active' ? (
                             (() => {
                                 const isOwner = user && user.id === listing.seller_id;
                                 if (isOwner) {
-                                    return (
-                                        <button disabled className="w-full bg-slate-800 text-slate-500 py-4 rounded-2xl font-bold text-lg cursor-not-allowed border border-slate-700">
-                                            You Own This Item
-                                        </button>
-                                    );
+                                    return <button disabled className="w-full bg-zinc-800 text-zinc-500 py-4 rounded-xl font-bold text-lg cursor-not-allowed">You Own This Item</button>;
                                 }
                                 if (hasRequested) {
-                                    return (
-                                        <button disabled className="w-full bg-primary/20 text-primary-light py-4 rounded-2xl font-bold text-lg cursor-not-allowed border border-primary/20">
-                                            Request Sent ✓
-                                        </button>
-                                    );
+                                    return <button disabled className="w-full bg-primary/10 text-primary py-4 rounded-xl font-bold text-lg cursor-not-allowed border border-primary/20">Request Pending...</button>;
                                 }
                                 return (
                                     <button
                                         onClick={() => {
                                             onRequest(listing.id);
-                                            setHasRequested(true); // Optimistic update
+                                            setHasRequested(true);
                                         }}
-                                        className="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 border border-white/20 hover:scale-[1.02] transition-transform"
+                                        className="w-full btn-primary text-black py-4 rounded-xl font-bold text-xl hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-lg shadow-white/5"
                                     >
                                         Send Purchase Request
                                     </button>
                                 );
                             })()
                         ) : (
-                            <button disabled className="w-full bg-slate-800 text-slate-500 py-4 rounded-2xl font-bold text-lg cursor-not-allowed border border-slate-700">
-                                Currently Unavailable
+                            <button disabled className="w-full bg-zinc-800 text-zinc-500 py-4 rounded-xl font-bold text-lg cursor-not-allowed">
+                                Item Sold
                             </button>
                         )}
                     </div>
@@ -321,66 +370,54 @@ const ListingCard = ({ listing, onView }) => {
 
     return (
         <div
-            className={`glass-panel-hover rounded-3xl overflow-hidden cursor-pointer group transition-all duration-500 flex flex-col h-full border border-slate-700/50 bg-slate-800/40 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 ${isSold ? 'opacity-60 grayscale hover:opacity-75' : ''}`}
-            onClick={() => !isSold && onView(listing)}
+            className={`group relative bg-[#09090b] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 border border-white/5 ${isSold ? 'opacity-60 grayscale hover:opacity-100' : 'hover:-translate-y-1'}`}
+            onClick={() => onView(listing)}
         >
-            <div className="h-56 bg-dark-950/50 flex items-center justify-center relative overflow-hidden group-hover:bg-dark-900/80 transition-colors">
+            {/* Image Container - Full Bleed */}
+            <div className="aspect-[4/3] relative overflow-hidden bg-zinc-900">
                 {listing.photos && listing.photos.length > 0 ? (
-                    <img src={listing.photos[0]} alt={listing.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" />
+                    <img src={listing.photos[0]} alt={listing.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 ) : (
-                    <div className="text-slate-600 flex flex-col items-center">
-                        <span className="text-5xl mb-2 opacity-30 group-hover:opacity-50 transition-opacity">📷</span>
+                    <div className="flex items-center justify-center w-full h-full text-zinc-700">
+                        <span className="text-4xl text-zinc-800">📷</span>
                     </div>
                 )}
 
-                <div className="absolute top-4 right-4 z-10">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-md border border-white/10 ${isSold ? 'bg-red-500 text-white' : (listing.status === 'active' ? 'bg-emerald-500/80 text-white' : 'bg-slate-500/80 text-white')}`}>
-                        {listing.status}
-                    </span>
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+
+                {/* Badges */}
+                <div className="absolute top-3 right-3 flex space-x-2">
+                    {isSold && <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-lg">Sold</span>}
+                    {!isSold && (
+                        <span className="bg-black/50 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider border border-white/10">
+                            {listing.condition.replace('_', ' ')}
+                        </span>
+                    )}
                 </div>
 
-                {isSold && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-0">
-                        <span className="text-4xl font-extrabold text-white border-4 border-white px-4 py-2 transform -rotate-12 opacity-80 uppercase tracking-widest">
-                            SOLD
-                        </span>
-                    </div>
-                )}
-
-                {!isSold && <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>}
+                {/* Quick View Button for Desktop */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex">
+                    <span className="bg-white/10 backdrop-blur-md text-white font-medium px-4 py-2 rounded-full border border-white/20 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        View Details
+                    </span>
+                </div>
             </div>
 
-            <div className="p-6 flex flex-col flex-1 relative">
-                <div className="flex justify-between items-start mb-3">
-                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary-light border border-primary/10 truncate max-w-[60%]">
-                        {listing.category}
-                    </span>
-                    <span className="text-xl font-bold text-secondary tracking-tight">₹{Math.floor(listing.price).toLocaleString('en-IN')}</span>
+            {/* Content */}
+            <div className="p-5 flex flex-col relative">
+                <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-primary-light uppercase tracking-wide">{listing.category}</span>
+                    <span className="text-base font-bold text-white tracking-tight">₹{Math.floor(listing.price).toLocaleString('en-IN')}</span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-light transition-colors line-clamp-2">{listing.title}</h3>
-                <p className="text-sm text-slate-400 mb-6 font-medium">{listing.brand} • {listing.model}</p>
+                <h3 className="text-lg font-bold text-zinc-100 mb-1 leading-tight group-hover:text-primary transition-colors line-clamp-1">
+                    {listing.title}
+                </h3>
+                <p className="text-xs text-zinc-500 font-medium mb-3">{listing.brand} • {listing.model}</p>
 
-                <div className="space-y-3 mb-6 flex-1">
-                    <div className="flex items-center text-sm p-2 rounded-lg bg-slate-800/50 border border-white/5">
-                        <span className="text-slate-400 w-20 flex-shrink-0">Condition</span>
-                        <span className={`font-bold ${listing.condition === 'broken' ? 'text-red-400' : 'text-emerald-400'}`}>
-                            {listing.condition.replace('_', ' ').toUpperCase()}
-                        </span>
-                    </div>
-                    <div className="flex items-center text-sm p-2 rounded-lg bg-slate-800/50 border border-white/5">
-                        <span className="text-slate-400 w-20 flex-shrink-0">Location</span>
-                        <span className="text-slate-300 truncate">{listing.location}</span>
-                    </div>
-                </div>
-
-                <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between text-sm group/btn">
-                    <span className="text-slate-400">{isSold ? 'Item Sold' : 'View Details'}</span>
-                    {!isSold && (
-                        <div className="bg-white/5 p-2 rounded-full group-hover/btn:bg-primary group-hover/btn:text-white transition-all duration-300">
-                            <span className="block transform group-hover/btn:-rotate-45 transition-transform">→</span>
-                        </div>
-                    )}
+                <div className="flex items-center text-xs text-zinc-400 border-t border-white/5 pt-3 mt-auto">
+                    <span className="mr-2">📍</span> {listing.location}
                 </div>
             </div>
         </div>
@@ -510,6 +547,7 @@ const HomePage = ({ setPage }) => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [sortBy, setSortBy] = useState('newest');
     const [selectedListing, setSelectedListing] = useState(null);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     // Debounce Search
     useEffect(() => {
@@ -552,29 +590,103 @@ const HomePage = ({ setPage }) => {
         }
     };
 
+    // Shared Filter Content
+    const FilterContent = () => (
+        <>
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-white text-lg">Filters</h3>
+                <button onClick={() => {
+                    setFilters({ category: '', condition: '', minPrice: '', maxPrice: '' });
+                    setSearchQuery('');
+                }} className="text-xs text-primary-light font-bold hover:text-white transition-colors uppercase tracking-wide">Reset</button>
+            </div>
+
+            <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Price Range (₹)</label>
+                <div className="flex gap-2">
+                    <input
+                        type="number"
+                        placeholder="Min"
+                        className="w-full rounded-xl px-3 py-2 text-sm bg-slate-800/50 border border-white/10 focus:ring-2 focus:ring-primary/50"
+                        value={filters.minPrice}
+                        onChange={e => setFilters({ ...filters, minPrice: e.target.value })}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Max"
+                        className="w-full rounded-xl px-3 py-2 text-sm bg-slate-800/50 border border-white/10 focus:ring-2 focus:ring-primary/50"
+                        value={filters.maxPrice}
+                        onChange={e => setFilters({ ...filters, maxPrice: e.target.value })}
+                    />
+                </div>
+            </div>
+
+            <div className="mb-8">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Category</label>
+                <input
+                    type="text"
+                    className="w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/50"
+                    placeholder="e.g. Phone"
+                    value={filters.category}
+                    onChange={e => setFilters({ ...filters, category: e.target.value })}
+                />
+            </div>
+
+            <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Condition</label>
+                <div className="space-y-2">
+                    {['', 'broken', 'for_parts', 'used', 'new'].map(cond => (
+                        <label key={cond} className={`flex items-center space-x-3 cursor-pointer p-3 rounded-xl transition-all ${filters.condition === cond ? 'bg-primary/20 border border-primary/30' : 'hover:bg-white/5 border border-transparent'}`}>
+                            <input
+                                type="radio"
+                                name="condition"
+                                value={cond}
+                                checked={filters.condition === cond}
+                                onChange={e => setFilters({ ...filters, condition: e.target.value })}
+                                className="hidden"
+                            />
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${filters.condition === cond ? 'border-primary' : 'border-slate-500'}`}>
+                                {filters.condition === cond && <div className="w-2 h-2 rounded-full bg-primary"></div>}
+                            </div>
+                            <span className={`text-sm font-medium ${filters.condition === cond ? 'text-white' : 'text-slate-400'}`}>
+                                {cond === '' ? 'All' : cond.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+        </>
+    );
+
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
             {/* Hero Section */}
-            <div className="mb-12 text-center animate-fade-in">
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+            <div className="mb-8 md:mb-12 text-center animate-fade-in">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 md:mb-6 tracking-tight leading-tight">
                     Find Value in <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Broken Tech</span>
                 </h1>
-                <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+                <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 md:mb-10 px-4">
                     The premium marketplace for buying and selling repairable electronics and parts.
                 </p>
 
                 {/* Search Bar */}
-                <div className="max-w-3xl mx-auto relative group z-10">
+                <div className="max-w-3xl mx-auto relative group z-10 px-2">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-500"></div>
                     <div className="relative flex items-center bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2">
-                        <span className="pl-4 text-2xl">🔍</span>
+                        <span className="pl-3 md:pl-4 text-xl md:text-2xl">🔍</span>
                         <input
                             type="text"
-                            placeholder="Server-side search by device, brand, or model..."
-                            className="bg-transparent border-none text-white text-lg w-full px-4 py-3 placeholder-slate-500 focus:ring-0"
+                            placeholder="Search..."
+                            className="bg-transparent border-none text-white text-base md:text-lg w-full px-3 md:px-4 py-3 placeholder-slate-500 focus:ring-0"
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                         />
+                        <button
+                            onClick={() => setShowMobileFilters(true)}
+                            className="md:hidden p-2 text-slate-300 hover:text-white border-l border-white/10 ml-2"
+                        >
+                            <span className="text-xl">⚙️</span>
+                        </button>
                         <div className="hidden md:flex border-l border-white/10 pl-2">
                             <select
                                 value={sortBy}
@@ -590,72 +702,32 @@ const HomePage = ({ setPage }) => {
                 </div>
             </div>
 
+            {/* Mobile Filter Drawer */}
+            {showMobileFilters && (
+                <div className="fixed inset-0 z-[100] md:hidden">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)}></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-[80%] max-w-[320px] bg-slate-900 border-l border-white/10 p-6 overflow-y-auto animate-slide-left shadow-2xl">
+                        <div className="flex justify-end mb-4">
+                            <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-white/5 rounded-full text-slate-400">✕</button>
+                        </div>
+                        <FilterContent />
+                        <div className="mt-8 pt-6 border-t border-white/10">
+                            <button
+                                onClick={() => setShowMobileFilters(false)}
+                                className="w-full btn-primary text-white py-3 rounded-xl font-bold"
+                            >
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex flex-col md:flex-row gap-8">
-                {/* Filter Sidebar */}
+                {/* Desktop Filter Sidebar */}
                 <div className="hidden md:block w-64 flex-shrink-0 animate-slide-up">
                     <div className="glass-panel p-6 rounded-2xl sticky top-28">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-bold text-white text-lg">Filters</h3>
-                            <button onClick={() => {
-                                setFilters({ category: '', condition: '', minPrice: '', maxPrice: '' });
-                                setSearchQuery('');
-                            }} className="text-xs text-primary-light font-bold hover:text-white transition-colors uppercase tracking-wide">Reset</button>
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Price Range (₹)</label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="number"
-                                    placeholder="Min"
-                                    className="w-full rounded-xl px-3 py-2 text-sm bg-slate-800/50 border border-white/10 focus:ring-2 focus:ring-primary/50"
-                                    value={filters.minPrice}
-                                    onChange={e => setFilters({ ...filters, minPrice: e.target.value })}
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Max"
-                                    className="w-full rounded-xl px-3 py-2 text-sm bg-slate-800/50 border border-white/10 focus:ring-2 focus:ring-primary/50"
-                                    value={filters.maxPrice}
-                                    onChange={e => setFilters({ ...filters, maxPrice: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mb-8">
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Category</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/50"
-                                placeholder="e.g. Phone"
-                                value={filters.category}
-                                onChange={e => setFilters({ ...filters, category: e.target.value })}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Condition</label>
-                            <div className="space-y-2">
-                                {['', 'broken', 'for_parts', 'used', 'new'].map(cond => (
-                                    <label key={cond} className={`flex items-center space-x-3 cursor-pointer p-3 rounded-xl transition-all ${filters.condition === cond ? 'bg-primary/20 border border-primary/30' : 'hover:bg-white/5 border border-transparent'}`}>
-                                        <input
-                                            type="radio"
-                                            name="condition"
-                                            value={cond}
-                                            checked={filters.condition === cond}
-                                            onChange={e => setFilters({ ...filters, condition: e.target.value })}
-                                            className="hidden"
-                                        />
-                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${filters.condition === cond ? 'border-primary' : 'border-slate-500'}`}>
-                                            {filters.condition === cond && <div className="w-2 h-2 rounded-full bg-primary"></div>}
-                                        </div>
-                                        <span className={`text-sm font-medium ${filters.condition === cond ? 'text-white' : 'text-slate-400'}`}>
-                                            {cond === '' ? 'All' : cond.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
+                        <FilterContent />
                     </div>
                 </div>
 
@@ -1391,10 +1463,11 @@ const App = () => {
 
     return (
         <AuthProvider>
-            <div className="min-h-screen text-slate-100 font-sans selection:bg-primary/30 selection:text-white">
+            <div className="min-h-screen text-slate-100 font-sans selection:bg-primary/30 selection:text-white pb-20 md:pb-0">
                 <CustomCursor />
+                <MobileTopBar setPage={setPage} />
                 <Navbar setPage={setPage} />
-                <main className="pb-20">
+                <main>
                     {page === 'home' && <HomePage setPage={setPage} />}
                     {page === 'login' && <LoginPage setPage={setPage} />}
                     {page === 'register' && <RegisterPage setPage={setPage} />}
@@ -1402,6 +1475,7 @@ const App = () => {
                     {page === 'dashboard' && <DashboardPage />}
                     {page === 'admin' && <AdminPage />}
                 </main>
+                <MobileBottomNav setPage={setPage} page={page} />
             </div>
         </AuthProvider>
     );
