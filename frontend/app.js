@@ -128,13 +128,13 @@ const CustomCursor = () => {
 
 // --- Components ---
 
-const Navbar = ({ setPage }) => {
+const Navbar = ({ setPage, page, searchQuery, setSearchQuery, sortBy, setSortBy, filters, setFilters, showMobileFilters, setShowMobileFilters }) => {
     const { user, logout } = useAuth();
     return (
         <nav className="glass-panel sticky top-0 z-50 border-b border-white/5 hidden md:block backdrop-blur-md bg-[#09090b]/80">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 items-center">
-                    <div className="flex cursor-pointer items-center space-x-3 group" onClick={() => setPage('home')}>
+                    <div className="flex cursor-pointer items-center space-x-3 group flex-shrink-0" onClick={() => setPage('home')}>
                         <div className="bg-primary/20 p-2 rounded-lg group-hover:bg-primary/30 transition-colors">
                             <span className="text-2xl">⚡</span>
                         </div>
@@ -142,8 +142,62 @@ const Navbar = ({ setPage }) => {
                             ElectroRecover
                         </span>
                     </div>
+
+                    {/* Integrated Action Bar (Only on Home) */}
+                    {page === 'home' && (
+                        <div className="flex-1 ml-12 flex items-center justify-start animate-fade-in">
+                            <div className="bg-black/60 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 shadow-2xl flex items-center space-x-2">
+                                {/* Search Toggle */}
+                                <div className={`relative flex items-center transition-all duration-300 ${searchQuery ? 'w-64 bg-[#09090b] border border-white/10' : 'w-10 hover:bg-white/5'} h-10 rounded-xl`}>
+                                    <div className="flex items-center justify-center w-10 h-10 flex-shrink-0 cursor-pointer" onClick={() => !searchQuery && document.getElementById('navbar-search-input')?.focus()}>
+                                        <span className="text-lg">🔍</span>
+                                    </div>
+                                    <input
+                                        id="navbar-search-input"
+                                        type="text"
+                                        placeholder="Search..."
+                                        className={`bg-transparent border-none text-white text-sm w-full h-full p-0 pr-4 placeholder-zinc-600 focus:ring-0 transition-opacity duration-200 ${searchQuery ? 'opacity-100' : 'opacity-0 w-0'}`}
+                                        value={searchQuery}
+                                        onChange={e => setSearchQuery(e.target.value)}
+                                    />
+                                    {searchQuery && (
+                                        <button onClick={() => setSearchQuery('')} className="absolute right-2 text-zinc-500 hover:text-white">✕</button>
+                                    )}
+                                </div>
+
+                                {/* Divider */}
+                                <div className="w-px h-5 bg-white/10 mx-1"></div>
+
+                                {/* Sort Icon Button */}
+                                <div className="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 cursor-pointer group">
+                                    <select
+                                        value={sortBy}
+                                        onChange={e => setSortBy(e.target.value)}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    >
+                                        <option value="newest">Latest</option>
+                                        <option value="price_low">Price: Low</option>
+                                        <option value="price_high">Price: High</option>
+                                    </select>
+                                    <span className="text-lg group-hover:scale-110 transition-transform">🔃</span>
+                                </div>
+
+                                {/* Filter Icon Button */}
+                                <button
+                                    onClick={() => setShowMobileFilters(true)}
+                                    className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors relative"
+                                    title="Filters"
+                                >
+                                    <span className="text-lg">⚙️</span>
+                                    {(filters.category || filters.condition || filters.minPrice || filters.maxPrice) && (
+                                        <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full"></span>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex items-center space-x-8">
-                        <button onClick={() => setPage('home')} className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Browse</button>
                         {user ? (
                             <>
                                 <button onClick={() => setPage('dashboard')} className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Dashboard</button>
@@ -539,15 +593,12 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
 // --- Pages ---
 
-const HomePage = ({ setPage }) => {
+const HomePage = ({ setPage, searchQuery, setSearchQuery, sortBy, setSortBy, filters, setFilters, showMobileFilters, setShowMobileFilters }) => {
     const [listings, setListings] = useState([]);
     // Removed filteredListings as we will use server-side filtering
-    const [filters, setFilters] = useState({ category: '', condition: '', minPrice: '', maxPrice: '' });
-    const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
-    const [sortBy, setSortBy] = useState('newest');
     const [selectedListing, setSelectedListing] = useState(null);
-    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    // Removed showMobileFilters as it's now a prop
 
     // Debounce Search
     useEffect(() => {
@@ -660,57 +711,6 @@ const HomePage = ({ setPage }) => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
-            {/* Icon-Only Action Bar */}
-            <div className="flex justify-center mb-8 sticky top-20 z-40">
-                <div className="bg-black/60 backdrop-blur-xl p-2 rounded-2xl border border-white/10 shadow-2xl flex items-center space-x-2 animate-fade-in">
-
-                    {/* Search Toggle */}
-                    <div className={`relative flex items-center transition-all duration-300 ${searchQuery ? 'w-64 bg-[#09090b] border border-white/10' : 'w-12 hover:bg-white/5'} h-12 rounded-xl`}>
-                        <div className="flex items-center justify-center w-12 h-12 flex-shrink-0 cursor-pointer" onClick={() => !searchQuery && document.getElementById('search-input')?.focus()}>
-                            <span className="text-xl">🔍</span>
-                        </div>
-                        <input
-                            id="search-input"
-                            type="text"
-                            placeholder="Search..."
-                            className={`bg-transparent border-none text-white text-sm w-full h-full p-0 pr-4 placeholder-zinc-600 focus:ring-0 transition-opacity duration-200 ${searchQuery ? 'opacity-100' : 'opacity-0 w-0'}`}
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                        />
-                        {searchQuery && (
-                            <button onClick={() => setSearchQuery('')} className="absolute right-3 text-zinc-500 hover:text-white">✕</button>
-                        )}
-                    </div>
-
-                    {/* Divider */}
-                    <div className="w-px h-6 bg-white/10 mx-1"></div>
-
-                    {/* Sort Icon Button */}
-                    <div className="relative w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/5 cursor-pointer group">
-                        <select
-                            value={sortBy}
-                            onChange={e => setSortBy(e.target.value)}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        >
-                            <option value="newest">Latest</option>
-                            <option value="price_low">Price: Low</option>
-                            <option value="price_high">Price: High</option>
-                        </select>
-                        <span className="text-xl group-hover:scale-110 transition-transform">🔃</span>
-                    </div>
-
-                    {/* Filter Icon Button (Mobile & Desktop Trigger) */}
-                    <button
-                        onClick={() => setShowMobileFilters(true)}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors relative"
-                    >
-                        <span className="text-xl">⚙️</span>
-                        {(filters.category || filters.condition || filters.minPrice || filters.maxPrice) && (
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
-                        )}
-                    </button>
-                </div>
-            </div>
 
             {/* Mobile Filter Drawer */}
             {showMobileFilters && (
@@ -1471,14 +1471,33 @@ const SoldItemsTable = () => {
 const App = () => {
     const [page, setPage] = useState('home');
 
+    // Lifted State for Search & Filters
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortBy, setSortBy] = useState('newest');
+    const [filters, setFilters] = useState({ category: '', condition: '', minPrice: '', maxPrice: '' });
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+
     return (
         <AuthProvider>
             <div className="min-h-screen text-slate-100 font-sans selection:bg-primary/30 selection:text-white pb-20 md:pb-0">
                 <CustomCursor />
                 <MobileTopBar setPage={setPage} />
-                <Navbar setPage={setPage} />
+                <Navbar
+                    setPage={setPage}
+                    page={page}
+                    searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+                    sortBy={sortBy} setSortBy={setSortBy}
+                    filters={filters} setFilters={setFilters}
+                    showMobileFilters={showMobileFilters} setShowMobileFilters={setShowMobileFilters}
+                />
                 <main>
-                    {page === 'home' && <HomePage setPage={setPage} />}
+                    {page === 'home' && <HomePage
+                        setPage={setPage}
+                        searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+                        sortBy={sortBy} setSortBy={setSortBy}
+                        filters={filters} setFilters={setFilters}
+                        showMobileFilters={showMobileFilters} setShowMobileFilters={setShowMobileFilters}
+                    />}
                     {page === 'login' && <LoginPage setPage={setPage} />}
                     {page === 'register' && <RegisterPage setPage={setPage} />}
                     {page === 'create-listing' && <CreateListingPage setPage={setPage} />}
