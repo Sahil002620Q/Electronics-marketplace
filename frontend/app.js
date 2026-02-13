@@ -660,45 +660,55 @@ const HomePage = ({ setPage }) => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
-            {/* Hero Section */}
-            <div className="mb-8 md:mb-12 text-center animate-fade-in">
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 md:mb-6 tracking-tight leading-tight">
-                    Find Value in <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Broken Tech</span>
-                </h1>
-                <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 md:mb-10 px-4">
-                    The premium marketplace for buying and selling repairable electronics and parts.
-                </p>
+            {/* Icon-Only Action Bar */}
+            <div className="flex justify-center mb-8 sticky top-20 z-40">
+                <div className="bg-black/60 backdrop-blur-xl p-2 rounded-2xl border border-white/10 shadow-2xl flex items-center space-x-2 animate-fade-in">
 
-                {/* Search Bar */}
-                <div className="max-w-3xl mx-auto relative group z-10 px-2">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity duration-500"></div>
-                    <div className="relative flex items-center bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2">
-                        <span className="pl-3 md:pl-4 text-xl md:text-2xl">🔍</span>
+                    {/* Search Toggle */}
+                    <div className={`relative flex items-center transition-all duration-300 ${searchQuery ? 'w-64 bg-[#09090b] border border-white/10' : 'w-12 hover:bg-white/5'} h-12 rounded-xl`}>
+                        <div className="flex items-center justify-center w-12 h-12 flex-shrink-0 cursor-pointer" onClick={() => !searchQuery && document.getElementById('search-input')?.focus()}>
+                            <span className="text-xl">🔍</span>
+                        </div>
                         <input
+                            id="search-input"
                             type="text"
                             placeholder="Search..."
-                            className="bg-transparent border-none text-white text-base md:text-lg w-full px-3 md:px-4 py-3 placeholder-slate-500 focus:ring-0"
+                            className={`bg-transparent border-none text-white text-sm w-full h-full p-0 pr-4 placeholder-zinc-600 focus:ring-0 transition-opacity duration-200 ${searchQuery ? 'opacity-100' : 'opacity-0 w-0'}`}
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                         />
-                        <button
-                            onClick={() => setShowMobileFilters(true)}
-                            className="md:hidden p-2 text-slate-300 hover:text-white border-l border-white/10 ml-2"
-                        >
-                            <span className="text-xl">⚙️</span>
-                        </button>
-                        <div className="hidden md:flex border-l border-white/10 pl-2">
-                            <select
-                                value={sortBy}
-                                onChange={e => setSortBy(e.target.value)}
-                                className="bg-transparent border-none text-slate-300 text-sm focus:ring-0 cursor-pointer hover:text-white transition-colors py-3"
-                            >
-                                <option value="newest">Latest Arrivals</option>
-                                <option value="price_low">Price: Low to High</option>
-                                <option value="price_high">Price: High to Low</option>
-                            </select>
-                        </div>
+                        {searchQuery && (
+                            <button onClick={() => setSearchQuery('')} className="absolute right-3 text-zinc-500 hover:text-white">✕</button>
+                        )}
                     </div>
+
+                    {/* Divider */}
+                    <div className="w-px h-6 bg-white/10 mx-1"></div>
+
+                    {/* Sort Icon Button */}
+                    <div className="relative w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/5 cursor-pointer group">
+                        <select
+                            value={sortBy}
+                            onChange={e => setSortBy(e.target.value)}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        >
+                            <option value="newest">Latest</option>
+                            <option value="price_low">Price: Low</option>
+                            <option value="price_high">Price: High</option>
+                        </select>
+                        <span className="text-xl group-hover:scale-110 transition-transform">🔃</span>
+                    </div>
+
+                    {/* Filter Icon Button (Mobile & Desktop Trigger) */}
+                    <button
+                        onClick={() => setShowMobileFilters(true)}
+                        className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors relative"
+                    >
+                        <span className="text-xl">⚙️</span>
+                        {(filters.category || filters.condition || filters.minPrice || filters.maxPrice) && (
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+                        )}
+                    </button>
                 </div>
             </div>
 
